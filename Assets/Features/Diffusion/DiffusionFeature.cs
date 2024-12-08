@@ -42,8 +42,13 @@ namespace Features.Diffusion
 
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
-            var cmd = CommandBufferPool.Get("Diffusion");
+            
             var camera = renderingData.cameraData.camera;
+            if (camera.cameraType == CameraType.Preview)
+            {
+                return;
+            }
+            var cmd = CommandBufferPool.Get("Diffusion");
             var desc = new RenderTextureDescriptor(renderingData.cameraData.cameraTargetDescriptor.width,
                 renderingData.cameraData.cameraTargetDescriptor.height, RenderTextureFormat.RGB111110Float);
 
