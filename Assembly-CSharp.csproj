@@ -47,8 +47,11 @@
   <ItemGroup>
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Features\Diffusion\DiffusionFeature.cs" />
+    <Compile Include="Assets\Features\VolumetricLight\VolumetricLightFeature.cs" />
+    <None Include="Assets\Features\VolumetricLight\KawaseBlur.hlsl" />
     <None Include="Assets\Features\Diffusion\Shader\Diffusion.shader" />
     <None Include="Assets\Effect\Glass\Shader\Glass.shader" />
+    <None Include="Assets\Features\VolumetricLight\VolumetricLight.shader" />
     <Reference Include="UnityEngine">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2022.3.34f1c1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
     </Reference>
