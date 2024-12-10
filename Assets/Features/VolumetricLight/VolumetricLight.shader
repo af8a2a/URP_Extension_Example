@@ -59,8 +59,33 @@
         }
         intensity /= _StepTime;
 
-        half3 color=SampleSceneColor(uv);
-        return half4(intensity, 1); //查看结果
+        Light mainLight = GetMainLight(); //引入场景灯光数据
+        return half4(mainLight.color*intensity, 1); //查看结果
+    }
+
+    half4 Blur(Varyings input):SV_TARGET
+    {
+        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+        float2 uv = UnityStereoTransformScreenSpaceTex(input.texcoord);
+
+        half4 tex = SAMPLE_TEXTURE2D(_BlitTexture, sampler_LinearClamp, uv); //中心像素
+        //四角像素
+        //注意这个【_BlurRange】，这就是扩大卷积核范围的参数
+        tex += SAMPLE_TEXTURE2D(_BlitTexture, sampler_LinearClamp, uv+float2(-1,-1)*_BlitTextureSize.xy*2);
+        tex += SAMPLE_TEXTURE2D(_BlitTexture, sampler_LinearClamp, uv+float2(1,-1)*_BlitTextureSize.xy*2);
+        tex += SAMPLE_TEXTURE2D(_BlitTexture, sampler_LinearClamp, uv+float2(-1,1)*_BlitTextureSize.xy*2);
+        tex += SAMPLE_TEXTURE2D(_BlitTexture, sampler_LinearClamp, uv+float2(1,1)*_BlitTextureSize.xy*2);
+        return tex / 5.0; //像素平均
+    }
+
+    half4 BlendFrag(Varyings input): SV_TARGET
+    {
+        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+        float2 uv = UnityStereoTransformScreenSpaceTex(input.texcoord);
+
+        half4 sceneColor = half4(SampleSceneColor(uv), 1);
+        half4 lightColor = SAMPLE_TEXTURE2D(_BlitTexture, sampler_LinearClamp, uv);
+        return lightColor + sceneColor;
     }
     ENDHLSL
 
@@ -77,7 +102,7 @@
 
         Pass
         {
-            Name "Blend"
+            Name "Compute"
 
             HLSLPROGRAM
             #pragma vertex Vert
@@ -86,15 +111,34 @@
         }
         Pass
         {
-            Name "Blur"
-            
+            Name "BlurH"
+
             HLSLPROGRAM
             #include "KawaseBlur.hlsl"
-            #pragma vertex vertex
-            #pragma fragment fragment
+            #pragma vertex Vert
+            #pragma fragment FragBlurH
+            ENDHLSL
+        }
+        Pass
+        {
+            Name "BlurV"
+
+            HLSLPROGRAM
+            #include "KawaseBlur.hlsl"
+            #pragma vertex Vert
+            #pragma fragment FragBlurV
             ENDHLSL
         }
 
+        Pass
+        {
+            Name "Blend"
+
+            HLSLPROGRAM
+            #pragma vertex Vert
+            #pragma fragment BlendFrag
+            ENDHLSL
+        }
 
     }
 }

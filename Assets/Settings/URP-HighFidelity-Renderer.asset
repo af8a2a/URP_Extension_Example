@@ -59,7 +59,7 @@ MonoBehaviour:
   settings:
     Intensity: 0.32
     _StepTime: 64
-  renderPassEvent: 550
+  renderPassEvent: 600
 --- !u!114 &-5690443130314557284
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -152,7 +152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed925c60396c4dfe928d6e623b0fd179, type: 3}
   m_Name: DiffusionFeature
   m_EditorClassIdentifier: 
-  m_Active: 0
+  m_Active: 1
   DiffusionMaterial: {fileID: 2100000, guid: 7cba9c40a7ea2c746bb8a79e3371649b, type: 2}
   renderPassEvent: 600
   Intensity: 0.456

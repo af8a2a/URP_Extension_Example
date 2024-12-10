@@ -20,7 +20,9 @@ public class VolumetricLightFeature : ScriptableRendererFeature
     class CustomRenderPass : ScriptableRenderPass
     {
         private Material _material;
-        private RTHandle sourceRT;
+        private RTHandle RT0;
+        private RTHandle RT1;
+
         private VolumetricLightSettings _settings;
 
         public CustomRenderPass(Material material, VolumetricLightSettings settings)
@@ -55,10 +57,14 @@ public class VolumetricLightFeature : ScriptableRendererFeature
             _material.SetFloat("_StepTime", _settings._StepTime);
             _material.SetFloat("_Intensity", _settings.Intensity);
 
-            RenderingUtils.ReAllocateIfNeeded(ref sourceRT, desc, name: "VolumetricLightRT");
+            RenderingUtils.ReAllocateIfNeeded(ref RT0, desc, name: "VolumetricLightBlurHorizonRT");
+            RenderingUtils.ReAllocateIfNeeded(ref RT1, desc, name: "VolumetricLightBlurVerticalRT");
 
 
-            Blit(cmd,renderingData.cameraData.renderer.cameraColorTargetHandle, sourceRT, _material, 0);
+            Blitter.BlitTexture(cmd,renderingData.cameraData.renderer.cameraColorTargetHandle, RT1, _material, 0);
+            Blit(cmd,RT1, RT0, _material, 1);
+            Blit(cmd,RT0, RT1, _material, 2);
+            Blit(cmd,RT1, renderingData.cameraData.renderer.cameraColorTargetHandle,_material, 3);
 
             context.ExecuteCommandBuffer(cmd);
             CommandBufferPool.Release(cmd);
