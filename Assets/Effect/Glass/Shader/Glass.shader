@@ -4,7 +4,7 @@ Shader "Glass"
     {
         [MainTexture] _BaseMap("Albedo", 2D) = "white" {}
         _Intensity("Intensity", Range(0.0, 1.0)) = 0.5
-        _Radius("Blur Radius", Range(0.0, 5.0)) = 0.5
+        //        _Radius("Blur Radius", Range(0.0, 5.0)) = 0.5
     }
     HLSLINCLUDE
     #define SAMPLE_TEXTURE2D
@@ -15,7 +15,8 @@ Shader "Glass"
     #include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
 
     float _Intensity;
-    float _Radius;
+    // float _Radius;
+    TEXTURE2D(_BlurTexture);
 
     struct Attributes
     {
@@ -101,87 +102,17 @@ Shader "Glass"
         #endif
     }
 
-    half4 FragBlurH(Varyings input)
-    {
-        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
-        float2 uv = GetNormalizedScreenSpaceUV(input.positionCS);
-        float texelSize = _ScreenSize.w * _Radius;
-
-
-        // 9-tap gaussian blur on the downsampled source
-        half3 c0 = DecodeHDR(SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_LinearClamp,
-                                                uv - float2(texelSize * 4.0, 0.0)));
-        half3 c1 = DecodeHDR(SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_LinearClamp,
-                                                        uv - float2(texelSize * 3.0, 0.0)));
-        half3 c2 = DecodeHDR(SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_LinearClamp,
-         uv - float2(texelSize * 2.0, 0.0)));
-        half3 c3 = DecodeHDR(SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_LinearClamp,
-      uv - float2(texelSize * 1.0, 0.0)));
-        half3 c4 = DecodeHDR(SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_LinearClamp, uv));
-        half3 c5 = DecodeHDR(SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_LinearClamp,
-uv + float2(texelSize * 1.0, 0.0)));
-        half3 c6 = DecodeHDR(SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_LinearClamp,
-                                                                               uv + float2(texelSize * 2.0, 0.0)));
-        half3 c7 = DecodeHDR(SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_LinearClamp,
-                              uv + float2(texelSize * 3.0, 0.0)));
-        half3 c8 = DecodeHDR(SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_LinearClamp,
-                                                           uv + float2(texelSize * 4.0, 0.0)));
-
-        half3 color = c0 * 0.01621622 + c1 * 0.05405405 + c2 * 0.12162162 + c3 * 0.19459459
-            + c4 * 0.22702703
-            + c5 * 0.19459459 + c6 * 0.12162162 + c7 * 0.05405405 + c8 * 0.01621622;
-        return EncodeHDR(color);
-    }
-
-    half4 FragBlurV(Varyings input)
-    {
-        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
-        float2 uv = GetNormalizedScreenSpaceUV(input.positionCS);
-        float texelSize = _ScreenSize.w * _Radius;
-
-        // Optimized bilinear 5-tap gaussian on the same-sized source (9-tap equivalent)
-        half3 c0 = DecodeHDR(SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_LinearClamp,
-                                                                   uv - float2(0.0, texelSize * 3.23076923)));
-        half3 c1 = DecodeHDR(SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_LinearClamp,
-            uv - float2(0.0, texelSize * 1.38461538)));
-        half3 c2 = DecodeHDR(SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_LinearClamp, uv));
-        half3 c3 = DecodeHDR(SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_LinearClamp,
-            uv + float2(0.0, texelSize * 1.38461538
-            )));
-        half3 c4 = DecodeHDR(SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_LinearClamp,
-                                                   uv + float2(0.0, texelSize * 3.23076923)));
-
-        half3 color = c0 * 0.07027027 + c1 * 0.31621622
-            + c2 * 0.22702703
-            + c3 * 0.31621622 + c4 * 0.07027027;
-
-        return EncodeHDR(color);
-    }
-
 
     half4 Frag(Varyings input) : SV_Target
     {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
         float2 uv = UnityStereoTransformScreenSpaceTex(input.uv);
 
-        float4 base_color = SAMPLE_TEXTURE2D_X(_BaseMap, sampler_LinearClamp, uv);
-        // float2 screenspace_uv = GetNormalizedScreenSpaceUV(input.positionCS);
-        // float texelSize = _ScreenSize.w * _Radius;
-        // half3 c0 = DecodeHDR(SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_LinearClamp,
-        //                                             screenspace_uv - float2(0.0, texelSize * 3.23076923)));
-        // half3 c1 = DecodeHDR(SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_LinearClamp,
-        //                                  screenspace_uv - float2(0.0, texelSize * 1.38461538)));
-        // half3 c2 = DecodeHDR(SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_LinearClamp, screenspace_uv));
-        // half3 c3 = DecodeHDR(SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_LinearClamp,
-        //              screenspace_uv + float2(0.0, texelSize * 1.38461538
-        //              )));
-        // half3 c4 = DecodeHDR(SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_LinearClamp,
-        //                                screenspace_uv + float2(0.0, texelSize * 3.23076923
-        //                                )));
-        half4 blurH = FragBlurH(input);
-        half4 blurV = FragBlurV(input);
+        float4 base_color = SAMPLE_TEXTURE2D(_BaseMap, sampler_LinearClamp, uv);
+        float2 screenspace_uv = GetNormalizedScreenSpaceUV(input.positionCS);
+        float4 blur_color = SAMPLE_TEXTURE2D(_BlurTexture, sampler_LinearClamp, screenspace_uv);
 
-        half4 color = lerp(base_color, (blurH + blurV) / 2.0, _Intensity);
+        half4 color = base_color * (blur_color * _Intensity);
         return EncodeHDR(color);
     }
     ENDHLSL
@@ -191,6 +122,7 @@ uv + float2(texelSize * 1.0, 0.0)));
         Tags
         {
             "RenderPipeline" = "UniversalPipeline"
+            "LightMode" = "UniversalForward"
         }
         LOD 100
 
@@ -199,6 +131,11 @@ uv + float2(texelSize * 1.0, 0.0)));
         Pass
         {
             Name "Frag"
+            Tags
+            {
+                "RenderPipeline" = "UniversalPipeline"
+                "LightMode" = "UniversalForward"
+            }
 
             HLSLPROGRAM
             #pragma vertex LitPassVertex
