@@ -14,7 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 1
   config:
-    blurAmount: 0
     blurMaterial: {fileID: 2100000, guid: 670fb847d3693b44482de7e8292dcb3f, type: 2}
 --- !u!114 &-8046564352974730807
 MonoBehaviour:

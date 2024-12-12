@@ -112,7 +112,7 @@ Shader "Glass"
         float2 screenspace_uv = GetNormalizedScreenSpaceUV(input.positionCS);
         float4 blur_color = SAMPLE_TEXTURE2D(_BlurTexture, sampler_LinearClamp, screenspace_uv);
 
-        half4 color = base_color * (blur_color * _Intensity);
+        half4 color = lerp(base_color, base_color * blur_color, _Intensity);
         return EncodeHDR(color);
     }
     ENDHLSL

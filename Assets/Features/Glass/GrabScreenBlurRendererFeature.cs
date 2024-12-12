@@ -8,7 +8,6 @@ public class GrabScreenBlurRendererFeature : ScriptableRendererFeature
     [Serializable]
     public class Config
     {
-        public float blurAmount;
         public Material blurMaterial;
     }
 
@@ -25,6 +24,9 @@ public class GrabScreenBlurRendererFeature : ScriptableRendererFeature
 
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
+        var volume = VolumeManager.instance.stack.GetComponent<GrabScreenBlur>();
+
+
         renderer.EnqueuePass(grabScreenBlurPass);
     }
 
@@ -32,18 +34,15 @@ public class GrabScreenBlurRendererFeature : ScriptableRendererFeature
     class GrabScreenBlurPass : ScriptableRenderPass
     {
         private Material blurMat;
-        private float blurAmount;
+        private int blurAmount;
 
         private RTHandle blurHorizonRT;
         private RTHandle blurVerticalRT;
         private RenderTexture _texture;
-        private int[] sizes = { 1, 2, 4, 8 };
 
         public GrabScreenBlurPass(Config config)
         {
             blurMat = config.blurMaterial;
-            blurAmount = config.blurAmount;
-
             profilingSampler = new ProfilingSampler(nameof(GrabScreenBlurPass));
         }
 
@@ -51,6 +50,7 @@ public class GrabScreenBlurRendererFeature : ScriptableRendererFeature
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             var camera = renderingData.cameraData.camera;
+
             if (camera.cameraType == CameraType.Preview)
             {
                 return;
@@ -60,24 +60,46 @@ public class GrabScreenBlurRendererFeature : ScriptableRendererFeature
 
             var desc = new RenderTextureDescriptor(renderingData.cameraData.cameraTargetDescriptor.width,
                 renderingData.cameraData.cameraTargetDescriptor.height, RenderTextureFormat.RGB111110Float);
+            var volume = VolumeManager.instance.stack.GetComponent<GrabScreenBlur>();
+            if (volume == null || !volume.IsActive())
+            {
+
+                return;
+            }
 
 
             RenderingUtils.ReAllocateIfNeeded(ref blurHorizonRT, desc, name: "CapturedBlurHorizonRT");
             RenderingUtils.ReAllocateIfNeeded(ref blurVerticalRT, desc, name: "CapturedBlurVerticalRT");
 
-            Blitter.BlitCameraTexture(cmd, renderingData.cameraData.renderer.cameraColorTargetHandle, blurHorizonRT,
-                blurMat, 0);
-            for (int i = 0; i < 4; i++)
+            Blitter.BlitCameraTexture(cmd, renderingData.cameraData.renderer.cameraColorTargetHandle, blurHorizonRT);
+            for (int i = 0; i < volume.blurAmount.value; i++)
             {
-                Blit(cmd, blurHorizonRT, blurVerticalRT, blurMat, i % 2);
-                (blurVerticalRT, blurHorizonRT) = (blurHorizonRT, blurVerticalRT);
+                Blit(cmd, blurHorizonRT, blurVerticalRT, blurMat);
+                Blit(cmd, blurVerticalRT, blurHorizonRT, blurMat, 1);
             }
+            cmd.SetGlobalTexture("_BlurTexture", blurHorizonRT);
+            blurMat.SetFloat("_BlurIntensity", volume.blurIntensity.value);
 
-            cmd.SetGlobalTexture("_BlurTexture", blurVerticalRT);
             context.ExecuteCommandBuffer(cmd);
             CommandBufferPool.Release(cmd);
         }
 
-        //schedule command buffer
+        public override void OnFinishCameraStackRendering(CommandBuffer cmd)
+        {
+            cmd.SetGlobalTexture("_BlurTexture", Texture2D.whiteTexture);
+
+        }
     }
+}
+
+[System.Serializable]
+public class GrabScreenBlur : VolumeComponent, IPostProcessComponent
+{
+    public ClampedIntParameter blurAmount = new ClampedIntParameter(0, 0, 4);
+    public ClampedFloatParameter blurIntensity = new ClampedFloatParameter(0f, 0f, 1f);
+
+
+    public bool IsActive() => active&&blurAmount.value>0&&blurIntensity.value>0;
+
+    public bool IsTileCompatible() => false;
 }
