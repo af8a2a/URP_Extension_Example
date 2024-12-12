@@ -47,6 +47,19 @@ MonoBehaviour:
   dirtIntensity:
     m_OverrideState: 0
     m_Value: 0
+--- !u!114 &-846946144023673425
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: VolumetricLightVolumeComponment
+  m_EditorClassIdentifier: Assembly-CSharp::VolumetricLightFeature/VolumetricLightVolumeComponment
+  active: 1
 --- !u!114 &-204174127918025611
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -82,6 +95,7 @@ MonoBehaviour:
   components:
   - {fileID: 849379129802519247}
   - {fileID: -7893295128165547882}
+  - {fileID: 1273492354945784155}
 --- !u!114 &849379129802519247
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -122,6 +136,25 @@ MonoBehaviour:
   maxNits:
     m_OverrideState: 0
     m_Value: 1000
+--- !u!114 &1273492354945784155
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: GrabScreenBlur
+  m_EditorClassIdentifier: Assembly-CSharp::GrabScreenBlur
+  active: 1
+  blurAmount:
+    m_OverrideState: 1
+    m_Value: 4
+  blurIntensity:
+    m_OverrideState: 1
+    m_Value: 1
 --- !u!114 &7555827183838488180
 MonoBehaviour:
   m_ObjectHideFlags: 3

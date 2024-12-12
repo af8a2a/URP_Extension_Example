@@ -1,5 +1,20 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-9002618474160471110
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd26f52e40af4926b84f097248462ec8, type: 3}
+  m_Name: GrabScreenBlurRendererFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  config:
+    blurMaterial: {fileID: 2100000, guid: 670fb847d3693b44482de7e8292dcb3f, type: 2}
 --- !u!114 &-8046564352974730807
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -54,12 +69,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c2b0ab9567497145b125dde0ad3a563, type: 3}
   m_Name: VolumetricLightFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   material: {fileID: 2100000, guid: dd07379497f21c54481980917993a88e, type: 2}
   settings:
-    Intensity: 0.32
-    _StepTime: 64
-  renderPassEvent: 600
+    Intensity: 0
+    _StepTime: 0
+  renderPassEvent: 550
 --- !u!114 &-5690443130314557284
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -97,7 +112,8 @@ MonoBehaviour:
   m_RendererFeatures:
   - {fileID: 4546765418592760336}
   - {fileID: -6176375078578449151}
-  m_RendererFeatureMap: 107240f40e5b193f0195c101971b49aa
+  - {fileID: -9002618474160471110}
+  m_RendererFeatureMap: 107240f40e5b193f0195c101971b49aabac34b1732461083
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -152,7 +168,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed925c60396c4dfe928d6e623b0fd179, type: 3}
   m_Name: DiffusionFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   DiffusionMaterial: {fileID: 2100000, guid: 7cba9c40a7ea2c746bb8a79e3371649b, type: 2}
   renderPassEvent: 600
   Intensity: 0.456
