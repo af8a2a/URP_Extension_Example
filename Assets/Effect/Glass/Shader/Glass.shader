@@ -4,7 +4,7 @@ Shader "Glass"
     {
         [MainTexture] _BaseMap("Albedo", 2D) = "white" {}
         _Intensity("Intensity", Range(0.0, 1.0)) = 0.5
-        //        _Radius("Blur Radius", Range(0.0, 5.0)) = 0.5
+        _Transparency("Transparency", Range(0.0, 1.0)) = 0.5
     }
     HLSLINCLUDE
     #define SAMPLE_TEXTURE2D
@@ -15,6 +15,7 @@ Shader "Glass"
     #include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
 
     float _Intensity;
+    float _Transparency;
     // float _Radius;
     TEXTURE2D(_BlurTexture);
 
@@ -111,7 +112,17 @@ Shader "Glass"
         float4 base_color = SAMPLE_TEXTURE2D(_BaseMap, sampler_LinearClamp, uv);
         float2 screenspace_uv = GetNormalizedScreenSpaceUV(input.positionCS);
         float4 blur_color = SAMPLE_TEXTURE2D(_BlurTexture, sampler_LinearClamp, screenspace_uv);
-
+        float4x4 thresholdMatrix =
+        {
+            1.0 / 17.0, 9.0 / 17.0, 3.0 / 17.0, 11.0 / 17.0,
+            13.0 / 17.0, 5.0 / 17.0, 15.0 / 17.0, 7.0 / 17.0,
+            4.0 / 17.0, 12.0 / 17.0, 2.0 / 17.0, 10.0 / 17.0,
+            16.0 / 17.0, 8.0 / 17.0, 14.0 / 17.0, 6.0 / 17.0
+        };
+        float4x4 _RowAccess = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+        float2 pos = input.positionCS.xy / input.positionCS.w;
+        pos *= _ScreenParams.xy; // pixel position
+        clip(_Transparency - thresholdMatrix[fmod(pos.x, 4)] * _RowAccess[fmod(pos.y, 4)]);
         half4 color = lerp(base_color, base_color * blur_color, _Intensity);
         return EncodeHDR(color);
     }
@@ -126,7 +137,7 @@ Shader "Glass"
         }
         LOD 100
 
-
+        UsePass "Universal Render Pipeline/Lit/SHADOWCASTER"
 
         Pass
         {
