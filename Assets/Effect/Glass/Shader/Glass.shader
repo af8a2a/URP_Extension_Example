@@ -107,11 +107,6 @@ Shader "Glass"
     half4 Frag(Varyings input) : SV_Target
     {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
-        float2 uv = UnityStereoTransformScreenSpaceTex(input.uv);
-
-        float4 base_color = SAMPLE_TEXTURE2D(_BaseMap, sampler_LinearClamp, uv);
-        float2 screenspace_uv = GetNormalizedScreenSpaceUV(input.positionCS);
-        float4 blur_color = SAMPLE_TEXTURE2D(_BlurTexture, sampler_LinearClamp, screenspace_uv);
         float4x4 thresholdMatrix =
         {
             1.0 / 17.0, 9.0 / 17.0, 3.0 / 17.0, 11.0 / 17.0,
@@ -119,10 +114,19 @@ Shader "Glass"
             4.0 / 17.0, 12.0 / 17.0, 2.0 / 17.0, 10.0 / 17.0,
             16.0 / 17.0, 8.0 / 17.0, 14.0 / 17.0, 6.0 / 17.0
         };
+
+
         float4x4 _RowAccess = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
-        float2 pos = input.positionCS.xy / input.positionCS.w;
+        float2 pos = input.positionCS.xy;
         pos *= _ScreenParams.xy; // pixel position
+        // pos /= 16;
         clip(_Transparency - thresholdMatrix[fmod(pos.x, 4)] * _RowAccess[fmod(pos.y, 4)]);
+
+        float2 uv = UnityStereoTransformScreenSpaceTex(input.uv);
+
+        float4 base_color = SAMPLE_TEXTURE2D(_BaseMap, sampler_LinearClamp, uv);
+        float2 screenspace_uv = GetNormalizedScreenSpaceUV(input.positionCS);
+        float4 blur_color = SAMPLE_TEXTURE2D(_BlurTexture, sampler_LinearClamp, screenspace_uv);
         half4 color = lerp(base_color, base_color * blur_color, _Intensity);
         return EncodeHDR(color);
     }
