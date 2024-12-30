@@ -99,49 +99,6 @@ MonoBehaviour:
   intensity:
     m_OverrideState: 1
     m_Value: 0
---- !u!114 &-132565664698226771
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 33eac5601302433faab1e2923ca852ff, type: 3}
-  m_Name: LPMVolume
-  m_EditorClassIdentifier: 
-  active: 0
-  Intensity:
-    m_OverrideState: 1
-    m_Value: 1
-  HdrMax:
-    m_OverrideState: 1
-    m_Value: 8
-  SoftGap:
-    m_OverrideState: 1
-    m_Value: 0
-  Exposure:
-    m_OverrideState: 1
-    m_Value: 0
-  LPMExposure:
-    m_OverrideState: 1
-    m_Value: 3
-  Contrast:
-    m_OverrideState: 1
-    m_Value: 0.3
-  ShoulderContrast:
-    m_OverrideState: 1
-    m_Value: 1
-  Saturation:
-    m_OverrideState: 1
-    m_Value: {x: 0, y: 0, z: 0}
-  Crosstalk:
-    m_OverrideState: 1
-    m_Value: {x: 1, y: 0.5, z: 0.03125}
-  displayMode:
-    m_OverrideState: 1
-    m_Value: 0
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -157,7 +114,7 @@ MonoBehaviour:
   components:
   - {fileID: 849379129802519247}
   - {fileID: -7893295128165547882}
-  - {fileID: -132565664698226771}
+  - {fileID: 6021617316971038843}
 --- !u!114 &849379129802519247
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -170,7 +127,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97c23e3b12dc18c42a140437e53d3951, type: 3}
   m_Name: Tonemapping
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   mode:
     m_OverrideState: 1
     m_Value: 2
@@ -280,6 +237,49 @@ MonoBehaviour:
   blurIntensity:
     m_OverrideState: 1
     m_Value: 0.691
+--- !u!114 &6021617316971038843
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33eac5601302433faab1e2923ca852ff, type: 3}
+  m_Name: LPMVolume
+  m_EditorClassIdentifier: 
+  active: 1
+  Intensity:
+    m_OverrideState: 1
+    m_Value: 1
+  HdrMax:
+    m_OverrideState: 1
+    m_Value: 256
+  SoftGap:
+    m_OverrideState: 1
+    m_Value: 0
+  Exposure:
+    m_OverrideState: 1
+    m_Value: 1
+  LPMExposure:
+    m_OverrideState: 1
+    m_Value: 8
+  Contrast:
+    m_OverrideState: 1
+    m_Value: 1
+  ShoulderContrast:
+    m_OverrideState: 1
+    m_Value: 1
+  Saturation:
+    m_OverrideState: 1
+    m_Value: {x: 0, y: 0, z: 0}
+  Crosstalk:
+    m_OverrideState: 1
+    m_Value: {x: 1, y: 0.5, z: 0.03125}
+  displayMode:
+    m_OverrideState: 1
+    m_Value: 0
 --- !u!114 &7555827183838488180
 MonoBehaviour:
   m_ObjectHideFlags: 3
