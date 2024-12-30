@@ -1,3 +1,5 @@
+using System;
+using Features.LPM;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -9,16 +11,20 @@ public class LPMFeature : ScriptableRendererFeature
         private const string lpmShaderName = "LPM";
 
         [SerializeField] private Material material;
+        private String lastKeyword = "SDR";
 
         static class ShaderConstants
         {
             public static readonly int _SoftGap = Shader.PropertyToID("_SoftGap");
             public static readonly int _HdrMax = Shader.PropertyToID("_HdrMax");
             public static readonly int _Exposure = Shader.PropertyToID("_Exposure");
+            public static readonly int _LPMExposure = Shader.PropertyToID("_LPMExposure");
             public static readonly int _Contrast = Shader.PropertyToID("_Contrast");
             public static readonly int _ShoulderContrast = Shader.PropertyToID("_ShoulderContrast");
             public static readonly int _Saturation = Shader.PropertyToID("_Saturation");
             public static readonly int _Crosstalk = Shader.PropertyToID("_Crosstalk");
+            public static readonly int _Intensity = Shader.PropertyToID("_LPMIntensity");
+            public static readonly int _DisplayMinMaxLuminance = Shader.PropertyToID("_DisplayMinMaxLuminance");
         }
 
         private Material lpmMaterial
@@ -34,37 +40,69 @@ public class LPMFeature : ScriptableRendererFeature
             }
         }
 
-        // This method is called before executing the render pass.
-        // It can be used to configure render targets and their clear state. Also to create temporary render target textures.
-        // When empty this render pass will render to the active camera render target.
-        // You should never call CommandBuffer.SetRenderTarget. Instead call <c>ConfigureTarget</c> and <c>ConfigureClear</c>.
-        // The render pipeline will ensure target setup and clearing happens in a performant manner.
-        public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
-        {
-        }
 
-        // Here you can implement the rendering logic.
-        // Use <c>ScriptableRenderContext</c> to issue drawing commands or execute command buffers
-        // https://docs.unity3d.com/ScriptReference/Rendering.ScriptableRenderContext.html
-        // You don't have to call ScriptableRenderContext.submit, the render pipeline will call it at specific points in the pipeline.
+
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
-            var cmd = CommandBufferPool.Get("Luma Preserving Mapping");
-            lpmMaterial.SetFloat(ShaderConstants._SoftGap, 1.0f / 16.0f);
-            lpmMaterial.SetFloat(ShaderConstants._HdrMax, 16.0f);
-            lpmMaterial.SetFloat(ShaderConstants._Exposure, 4.0f);
-            lpmMaterial.SetFloat(ShaderConstants._Contrast, 0f);
-            lpmMaterial.SetFloat(ShaderConstants._ShoulderContrast, 1.0f);
+            var volume = VolumeManager.instance.stack.GetComponent<LPMVolume>();
+            if (volume == null || !volume.IsActive())
+            {
+                return;
+            }
 
-            lpmMaterial.SetVector(ShaderConstants._Saturation, Vector3.one);
-            lpmMaterial.SetVector(ShaderConstants._Crosstalk, new Vector3(1.0f, 0.5f, 1.0f / 32.0f));
+            var camera = renderingData.cameraData.camera;
+
+            if (camera.cameraType == CameraType.Preview)
+            {
+                return;
+            }
+
+            lpmMaterial.SetFloat(ShaderConstants._SoftGap, volume.SoftGap.value);
+            lpmMaterial.SetFloat(ShaderConstants._HdrMax, volume.HdrMax.value);
+            lpmMaterial.SetFloat(ShaderConstants._LPMExposure, volume.LPMExposure.value);
+            lpmMaterial.SetFloat(ShaderConstants._Exposure, MathF.Pow(2.0f, volume.Exposure.value));
+            lpmMaterial.SetFloat(ShaderConstants._Contrast, volume.Contrast.value);
+            lpmMaterial.SetFloat(ShaderConstants._ShoulderContrast, volume.ShoulderContrast.value);
+            lpmMaterial.SetFloat(ShaderConstants._Intensity, volume.Intensity.value);
+
+            lpmMaterial.SetVector(ShaderConstants._Saturation, volume.Saturation.value);
+            lpmMaterial.SetVector(ShaderConstants._Crosstalk, volume.Crosstalk.value);
+            var cmd = CommandBufferPool.Get("Luma Preserving Mapping");
+            if (renderingData.cameraData.isHDROutputActive)
+            {
+                lpmMaterial.SetVector(ShaderConstants._DisplayMinMaxLuminance,
+                    new Vector2(renderingData.cameraData.hdrDisplayInformation.minToneMapLuminance,
+                        renderingData.cameraData.hdrDisplayInformation.maxToneMapLuminance));
+            }
+
+            //now only support SDR
+            lpmMaterial.DisableKeyword(lastKeyword);
+            switch (volume.displayMode.value)
+            {
+                case DisplayMode.SDR:
+                    lpmMaterial.EnableKeyword("SDR");
+                    lastKeyword = "SDR";
+                    break;
+                case DisplayMode.DISPLAYMODE_HDR10_SCRGB:
+                    lpmMaterial.EnableKeyword("DISPLAYMODE_HDR10_SCRGB");
+                    lastKeyword = "DISPLAYMODE_HDR10_SCRGB";
+                    break;
+                case DisplayMode.DISPLAYMODE_HDR10_2084:
+                    lpmMaterial.EnableKeyword("DISPLAYMODE_HDR10_2084");
+                    lastKeyword = "DISPLAYMODE_HDR10_2084";
+                    break;
+            }
+
+
+
             Blit(cmd, ref renderingData, lpmMaterial);
-            // Blit(cmd, ref renderingData, lpmMaterial);
+
             context.ExecuteCommandBuffer(cmd);
             cmd.Release();
         }
     }
 
+    public RenderPassEvent renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
     LumaPreservingMapperPass m_ScriptablePass;
 
     /// <inheritdoc/>
@@ -73,13 +111,17 @@ public class LPMFeature : ScriptableRendererFeature
         m_ScriptablePass = new LumaPreservingMapperPass();
 
         // Configures where the render pass should be injected.
-        m_ScriptablePass.renderPassEvent = RenderPassEvent.AfterRendering;
+        m_ScriptablePass.renderPassEvent = renderPassEvent;
     }
 
     // Here you can inject one or multiple render passes in the renderer.
     // This method is called when setting up the renderer once per-camera.
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
-        renderer.EnqueuePass(m_ScriptablePass);
+        var volume = VolumeManager.instance.stack.GetComponent<LPMVolume>();
+        if (volume != null && volume.IsActive())
+        {
+            renderer.EnqueuePass(m_ScriptablePass);
+        }
     }
 }

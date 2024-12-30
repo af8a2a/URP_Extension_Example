@@ -126,15 +126,25 @@ float3 Apply_LPM(float3 color)
     AU4 map0, map1, map2, map3, map4, map5, map6, map7;
     AU4 map8, map9, mapA, mapB, mapC, mapD, mapE, mapF;
     AU4 mapG = 0, mapH = 0, mapI = 0, mapJ = 0, mapK = 0, mapL = 0, mapM = 0, mapN = 0;
+    float hdr10S = LpmHdr10RawScalar(_DisplayMinMaxLuminance.y);
+
     LpmSetup(map0, map1, map2, map3, map4, map5, map6, map7,
              map8, map9, mapA, mapB, mapC, mapD, mapE, mapF,
              mapG, mapH, mapI, mapJ, mapK, mapL, mapM, mapN,
              true,
+             #if defined(DISPLAYMODE_HDR10_SCRGB)
+             LPM_CONFIG_HDR10SCRGB_709,
+             LPM_COLORS_HDR10SCRGB_709,
+             #elif defined(DISPLAYMODE_HDR10_2084)
+             LPM_CONFIG_HDR10RAW_709,
+             LPM_COLORS_HDR10RAW_709,
+             #else
              LPM_CONFIG_709_709,
              LPM_COLORS_709_709,
+             #endif
              _SoftGap,
              _HdrMax,
-             _Exposure,
+             _LPMExposure,
              _Contrast,
              _ShoulderContrast,
              _Saturation,
@@ -143,8 +153,14 @@ float3 Apply_LPM(float3 color)
 
     LpmFilter(color.r, color.g, color.b,
               true,
+              #if defined(DISPLAYMODE_HDR10_SCRGB)
+              LPM_CONFIG_HDR10SCRGB_709,
+              #elif defined(DISPLAYMODE_HDR10_2084)
+              LPM_CONFIG_HDR10RAW_709,
+              #else
               LPM_CONFIG_709_709,
-              map0, map1, map2, map3, map4, map5, map6, map7,
+              #endif
+               map0, map1, map2, map3, map4, map5, map6, map7,
               map8, map9, mapA, mapB, mapC, mapD, mapE, mapF,
               mapG, mapH, mapI, mapJ, mapK, mapL, mapM, mapN
     );

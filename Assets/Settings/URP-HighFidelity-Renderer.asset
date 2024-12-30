@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd26f52e40af4926b84f097248462ec8, type: 3}
   m_Name: GrabScreenBlurRendererFeature
   m_EditorClassIdentifier: 
-  m_Active: 0
+  m_Active: 1
   config:
     blurMaterial: {fileID: 2100000, guid: 670fb847d3693b44482de7e8292dcb3f, type: 2}
 --- !u!114 &-8046564352974730807
@@ -93,6 +93,20 @@ MonoBehaviour:
     Intensity: 0
     _StepTime: 0
   renderPassEvent: 600
+--- !u!114 &-2902112244124871261
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e32e72b6a3f58a24c9033e2b9275eea0, type: 3}
+  m_Name: ScreenSpaceShadows
+  m_EditorClassIdentifier: 
+  m_Active: 0
+  m_Shader: {fileID: 4800000, guid: 0f854b35a0cf61a429bd5dcfea30eddd, type: 3}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -114,7 +128,9 @@ MonoBehaviour:
   - {fileID: -6176375078578449151}
   - {fileID: -9002618474160471110}
   - {fileID: 8508543744943413698}
-  m_RendererFeatureMap: 107240f40e5b193f0195c101971b49aabac34b1732461083c25939b1746b1476
+  - {fileID: -2902112244124871261}
+  - {fileID: 8954296569333617161}
+  m_RendererFeatureMap: 107240f40e5b193f0195c101971b49aabac34b1732461083c25939b1746b1476a315a03e4aa0b9d70912a1b4490d447c
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -191,7 +207,7 @@ MonoBehaviour:
   m_Active: 0
   DiffusionMaterial: {fileID: 2100000, guid: 7cba9c40a7ea2c746bb8a79e3371649b, type: 2}
   renderPassEvent: 600
-  Intensity: 0.456
+  Intensity: 0
 --- !u!114 &8508543744943413698
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -204,6 +220,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48a7b5e4bc207884ba4cd62fb6bd50e0, type: 3}
   m_Name: ForwardSSRFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   resolution: 4
   mipmapsMode: 1
+--- !u!114 &8954296569333617161
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7120929398c73e440bffead9b1637d67, type: 3}
+  m_Name: LPMFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  renderPassEvent: 600
