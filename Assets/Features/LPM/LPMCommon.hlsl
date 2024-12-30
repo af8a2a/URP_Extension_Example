@@ -126,8 +126,11 @@ float3 Apply_LPM(float3 color)
     AU4 map0, map1, map2, map3, map4, map5, map6, map7;
     AU4 map8, map9, mapA, mapB, mapC, mapD, mapE, mapF;
     AU4 mapG = 0, mapH = 0, mapI = 0, mapJ = 0, mapK = 0, mapL = 0, mapM = 0, mapN = 0;
+    #if defined(DISPLAYMODE_HDR10_SCRGB)
+    float hdr10S = LpmHdr10ScrgbScalar(_DisplayMinMaxLuminance.y);
+    #elif defined(DISPLAYMODE_HDR10_2084)
     float hdr10S = LpmHdr10RawScalar(_DisplayMinMaxLuminance.y);
-
+    #endif
     LpmSetup(map0, map1, map2, map3, map4, map5, map6, map7,
              map8, map9, mapA, mapB, mapC, mapD, mapE, mapF,
              mapG, mapH, mapI, mapJ, mapK, mapL, mapM, mapN,
@@ -164,5 +167,6 @@ float3 Apply_LPM(float3 color)
               map8, map9, mapA, mapB, mapC, mapD, mapE, mapF,
               mapG, mapH, mapI, mapJ, mapK, mapL, mapM, mapN
     );
+    
     return color;
 }

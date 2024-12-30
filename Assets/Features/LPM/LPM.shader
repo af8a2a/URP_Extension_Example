@@ -3,7 +3,6 @@
     HLSLINCLUDE
     #pragma exclude_renderers gles
     #define SHADER_TARGET 50
-    #pragma shader_feature SDR DISPLAYMODE_HDR10_SCRGB DISPLAYMODE_HDR10_2084
     float _SoftGap;
     // Range of 0 to a little over zero, controls how much feather region in out-of-gamut mapping, 0=clip.
     float _HdrMax; // Maximum input value.
@@ -53,6 +52,8 @@
             Name "Luma Preserving Mapping"
 
             HLSLPROGRAM
+            #pragma shader_feature SDR DISPLAYMODE_HDR10_SCRGB DISPLAYMODE_HDR10_2084
+
             #pragma vertex Vert
             #pragma fragment Frag_LPM
             ENDHLSL

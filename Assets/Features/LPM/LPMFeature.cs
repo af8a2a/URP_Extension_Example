@@ -68,13 +68,20 @@ public class LPMFeature : ScriptableRendererFeature
             lpmMaterial.SetVector(ShaderConstants._Saturation, volume.Saturation.value);
             lpmMaterial.SetVector(ShaderConstants._Crosstalk, volume.Crosstalk.value);
             var cmd = CommandBufferPool.Get("Luma Preserving Mapping");
-            if (renderingData.cameraData.isHDROutputActive)
+            // if (HDROutputSettings.main.active)
+            // {
+            //     lpmMaterial.SetVector(ShaderConstants._DisplayMinMaxLuminance,
+            //         new Vector2(renderingData.cameraData.hdrDisplayInformation.minToneMapLuminance,
+            //             renderingData.cameraData.hdrDisplayInformation.maxToneMapLuminance));
+            // }
+
+            if (volume.displayMode.value != DisplayMode.SDR)
             {
                 lpmMaterial.SetVector(ShaderConstants._DisplayMinMaxLuminance,
                     new Vector2(renderingData.cameraData.hdrDisplayInformation.minToneMapLuminance,
                         renderingData.cameraData.hdrDisplayInformation.maxToneMapLuminance));
-            }
 
+            }
             //now only support SDR
             lpmMaterial.DisableKeyword(lastKeyword);
             switch (volume.displayMode.value)
