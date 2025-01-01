@@ -14,7 +14,7 @@ namespace Features.LPM
 
     public class LPMVolume : VolumeComponent, IPostProcessComponent
     {
-        public ClampedFloatParameter Intensity = new ClampedFloatParameter(1f, 0f, 1f);
+        public ClampedFloatParameter Intensity = new ClampedFloatParameter(0f, 0f, 1f);
         public FloatParameter HdrMax = new FloatParameter(256.0f);
         public ClampedFloatParameter SoftGap = new ClampedFloatParameter(0f, 0f, 1f);
         public ClampedFloatParameter Exposure = new ClampedFloatParameter(0.0f, -4.0f, 1.0f);
@@ -27,7 +27,7 @@ namespace Features.LPM
 
         public bool IsActive()
         {
-            return Intensity.value > 0f && active;
+            return Intensity.value > 0f;
         }
 
         public bool IsTileCompatible() => false;
