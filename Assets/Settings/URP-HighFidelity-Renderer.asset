@@ -93,6 +93,19 @@ MonoBehaviour:
     Intensity: 0
     _StepTime: 0
   renderPassEvent: 600
+--- !u!114 &-3686001903448193319
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 249f676b65f918e43b6223deea9ed0ef, type: 3}
+  m_Name: FlimRenderPassFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
 --- !u!114 &-2902112244124871261
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -130,7 +143,8 @@ MonoBehaviour:
   - {fileID: 8508543744943413698}
   - {fileID: -2902112244124871261}
   - {fileID: 8954296569333617161}
-  m_RendererFeatureMap: 107240f40e5b193f0195c101971b49aabac34b1732461083c25939b1746b1476a315a03e4aa0b9d70912a1b4490d447c
+  - {fileID: -3686001903448193319}
+  m_RendererFeatureMap: 107240f40e5b193f0195c101971b49aabac34b1732461083c25939b1746b1476a315a03e4aa0b9d70912a1b4490d447cd9868e4fccb0d8cc
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}

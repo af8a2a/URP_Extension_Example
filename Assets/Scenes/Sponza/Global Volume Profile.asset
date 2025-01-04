@@ -67,7 +67,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33eac5601302433faab1e2923ca852ff, type: 3}
   m_Name: LPMVolume
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   Intensity:
     m_OverrideState: 1
     m_Value: 1

@@ -67,6 +67,7 @@ MonoBehaviour:
   components:
   - {fileID: 849379129802519247}
   - {fileID: 6021617316971038843}
+  - {fileID: 2254744145489006594}
 --- !u!114 &849379129802519247
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -170,6 +171,22 @@ MonoBehaviour:
   accumFactor:
     m_OverrideState: 1
     m_Value: 0.751
+--- !u!114 &2254744145489006594
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6bd81037f93646c8bb736cd37645c574, type: 3}
+  m_Name: FlimVolume
+  m_EditorClassIdentifier: 
+  active: 1
+  Intensity:
+    m_OverrideState: 0
+    m_Value: 0
 --- !u!114 &3147227526466114598
 MonoBehaviour:
   m_ObjectHideFlags: 3
