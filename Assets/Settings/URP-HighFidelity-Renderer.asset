@@ -144,7 +144,8 @@ MonoBehaviour:
   - {fileID: -2902112244124871261}
   - {fileID: 8954296569333617161}
   - {fileID: -3686001903448193319}
-  m_RendererFeatureMap: 107240f40e5b193f0195c101971b49aabac34b1732461083c25939b1746b1476a315a03e4aa0b9d70912a1b4490d447cd9868e4fccb0d8cc
+  - {fileID: 5183089323404221537}
+  m_RendererFeatureMap: 107240f40e5b193f0195c101971b49aabac34b1732461083c25939b1746b1476a315a03e4aa0b9d70912a1b4490d447cd9868e4fccb0d8cc61dca0484708ee47
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -222,6 +223,19 @@ MonoBehaviour:
   DiffusionMaterial: {fileID: 2100000, guid: 7cba9c40a7ea2c746bb8a79e3371649b, type: 2}
   renderPassEvent: 600
   Intensity: 0
+--- !u!114 &5183089323404221537
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ca32dec4987d644084938568cf1ef48, type: 3}
+  m_Name: OcclusionOutlineFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
 --- !u!114 &8508543744943413698
 MonoBehaviour:
   m_ObjectHideFlags: 0

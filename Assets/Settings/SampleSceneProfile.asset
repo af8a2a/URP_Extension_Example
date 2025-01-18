@@ -183,10 +183,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6bd81037f93646c8bb736cd37645c574, type: 3}
   m_Name: FlimVolume
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   Intensity:
-    m_OverrideState: 0
-    m_Value: 0
+    m_OverrideState: 1
+    m_Value: 1
 --- !u!114 &3147227526466114598
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -218,7 +218,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33eac5601302433faab1e2923ca852ff, type: 3}
   m_Name: LPMVolume
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   Intensity:
     m_OverrideState: 1
     m_Value: 1
