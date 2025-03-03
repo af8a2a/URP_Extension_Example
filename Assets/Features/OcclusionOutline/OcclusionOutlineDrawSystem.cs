@@ -49,7 +49,6 @@ namespace Features.OcclusionOutline
 
         public void Register(OcclusionOutlineController obj)
         {
-            Debug.Log(1);
             if (!renderData.TryGetValue(obj, out var value))
             {
                 var material = new Material(OutlineMaterial);
