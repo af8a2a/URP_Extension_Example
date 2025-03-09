@@ -39,24 +39,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31c2391703a740f69dd3d91b77a69987, type: 3}
+  m_Script: {fileID: 0}
   m_Name: CACAOFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
-  setting:
-    radius: 0.05
-    shadowMultiplier: 1.1
-    shadowPower: 0
-    shadowClamp: 0
-    horizonAngleThreshold: 0
-    fadeOutFrom: 0
-    fadeOutTo: 17.7
-    qualityLevel: 0
-    adaptiveQualityLevel: 0
-    blurPassCount: 0
-    sharpness: 0
-    detailShadowStrength: 0
-  CACAOMaterial: {fileID: 2100000, guid: 1ae6edd39d1a3ef49bde39bad3e54a73, type: 2}
 --- !u!114 &-6176375078578449151
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -93,6 +78,29 @@ MonoBehaviour:
     Intensity: 0
     _StepTime: 0
   renderPassEvent: 600
+--- !u!114 &-5323435224801480069
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0eea7d8a15f148338018ec7ed3ec86b2, type: 3}
+  m_Name: GroundTruthAmbientOcclusion
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  m_Shader: {fileID: 4800000, guid: 84009a12bf104e23baa1afc4097e0388, type: 3}
+  m_Settings:
+    Downsample: 1
+    AfterOpaque: 1
+    Source: 1
+    NormalSamples: 1
+    Intensity: 3.24
+    DirectLightingStrength: 0.364
+    Radius: 0.035
+    SampleCount: 14
 --- !u!114 &-3686001903448193319
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -120,6 +128,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 0
   m_Shader: {fileID: 4800000, guid: 0f854b35a0cf61a429bd5dcfea30eddd, type: 3}
+--- !u!114 &-766027341213290787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2866714ef44f407fae0ef5c6038b2e3e, type: 3}
+  m_Name: PerObjectShadowFeature
+  m_EditorClassIdentifier: 
+  m_Active: 0
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -145,7 +166,10 @@ MonoBehaviour:
   - {fileID: 8954296569333617161}
   - {fileID: -3686001903448193319}
   - {fileID: 5183089323404221537}
-  m_RendererFeatureMap: 107240f40e5b193f0195c101971b49aabac34b1732461083c25939b1746b1476a315a03e4aa0b9d70912a1b4490d447cd9868e4fccb0d8cc61dca0484708ee47
+  - {fileID: -766027341213290787}
+  - {fileID: 3461166638362642092}
+  - {fileID: -5323435224801480069}
+  m_RendererFeatureMap: 107240f40e5b193f0195c101971b49aabac34b1732461083c25939b1746b1476a315a03e4aa0b9d70912a1b4490d447cd9868e4fccb0d8cc61dca0484708ee47ddaebe1631865ef5acc60934b88808307bf2e728de5b1fb6
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -207,6 +231,19 @@ MonoBehaviour:
   mipmapsMode: 1
   sceneView: 1
   isLogPrinted: 0
+--- !u!114 &3461166638362642092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e97072c0e2148ebadb06fe0c0adae7d, type: 3}
+  m_Name: ScratchFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
 --- !u!114 &4546765418592760336
 MonoBehaviour:
   m_ObjectHideFlags: 0
