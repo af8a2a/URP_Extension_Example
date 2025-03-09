@@ -83,8 +83,13 @@ namespace Features.AO.GTAO
                     GetType().Name, name);
                 return;
             }
-
+    
             bool shouldAdd = m_SSAOPass.Setup(m_Settings, renderer, m_Material);
+            if (renderingData.cameraData.isPreviewCamera||renderingData.cameraData.postProcessEnabled==false)
+            {
+                return;
+            }
+
             if (shouldAdd)
             {
                 renderer.EnqueuePass(m_SSAOPass);
@@ -138,7 +143,6 @@ namespace Features.AO.GTAO
             private ProfilingSampler m_ProfilingSampler = new ProfilingSampler("GTAO");
             private ScriptableRenderer m_Renderer = null;
 
-            private RTHandle m_ColorBaseRT;
             private RTHandle m_AOPassRT;
             private RTHandle m_BlurHorizonRT;
             private RTHandle m_BlurVerticalRT;
@@ -339,8 +343,6 @@ namespace Features.AO.GTAO
                 descriptor.depthBufferBits = 0;
                 descriptor.width /= downsampleDivider;
                 descriptor.height /= downsampleDivider;
-                descriptor.colorFormat = RenderTextureFormat.RGB111110Float;
-                RenderingUtils.ReAllocateIfNeeded(ref m_ColorBaseRT, descriptor, name: "ColorBaseRT");
 
                 descriptor.colorFormat = RenderTextureFormat.ARGB32;
                 RenderingUtils.ReAllocateIfNeeded(ref m_AOPassRT, descriptor, name: "AOPassRT");
@@ -384,8 +386,6 @@ namespace Features.AO.GTAO
                     }
 
 
-                    Blit(cmd, renderingData.cameraData.renderer.cameraColorTargetHandle, m_ColorBaseRT);
-                    m_Material.SetTexture("SourceRT", m_ColorBaseRT);
                     // Execute the SSAO
                     Blitter.BlitCameraTexture(cmd, renderingData.cameraData.renderer.cameraColorTargetHandle,
                         m_AOPassRT, m_Material, (int)ShaderPasses.AO);
@@ -405,11 +405,12 @@ namespace Features.AO.GTAO
                     // Set the global SSAO texture and AO Params
                     cmd.SetGlobalTexture(k_SSAOTextureName, m_FinalRT);
                     cmd.SetGlobalVector(k_SSAOAmbientOcclusionParamName,
-                        new Vector4(0f, 0f, 0f, m_CurrentSettings.DirectLightingStrength));
+                        new Vector4(1f, 0f, 0f, m_CurrentSettings.DirectLightingStrength));
 
                     // If true, SSAO pass is inserted after opaque pass and is expected to modulate lighting result now.
                     if (m_CurrentSettings.AfterOpaque)
                     {
+
                         CoreUtils.SetKeyword(cmd, ShaderKeywordStrings.ScreenSpaceOcclusion, m_CurrentSettings.AfterOpaque);
                         // This implicitly also bind depth attachment. Explicitly binding m_Renderer.cameraDepthTarget does not work.
                         Blitter.BlitCameraTexture(cmd, m_FinalRT,
@@ -437,24 +438,7 @@ namespace Features.AO.GTAO
 
             }
 
-            internal static void SetSourceSize(CommandBuffer cmd, RenderTextureDescriptor desc)
-            {
-                float width = desc.width;
-                float height = desc.height;
-                if (desc.useDynamicScale)
-                {
-                    width *= ScalableBufferManager.widthScaleFactor;
-                    height *= ScalableBufferManager.heightScaleFactor;
-                }
 
-                cmd.SetGlobalVector(ShaderConstants._SourceSize,
-                    new Vector4(width, height, 1.0f / width, 1.0f / height));
-            }
-
-            static class ShaderConstants
-            {
-                public static readonly int _SourceSize = Shader.PropertyToID("_SourceSize");
-            }
         }
     }
 }

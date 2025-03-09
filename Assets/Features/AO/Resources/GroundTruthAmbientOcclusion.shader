@@ -132,16 +132,12 @@
             #define _SCREEN_SPACE_OCCLUSION
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
-            TEXTURE2D(SourceRT);
 
             half4 FragAfterOpaque(Varyings input) : SV_Target
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
-                float ssao = SampleAmbientOcclusion(input.texcoord);
-                // AmbientOcclusionFactor aoFactor = GetScreenSpaceAmbientOcclusion(input.texcoord);
-                // half occlusion = aoFactor.indirectAmbientOcclusion;
-                half4 color = SAMPLE_TEXTURE2D(SourceRT, sampler_LinearClamp, input.texcoord);
-                return color * ssao;
+                AmbientOcclusionFactor aoFactor = GetScreenSpaceAmbientOcclusion(input.texcoord);
+                return half4(0,0,0,  aoFactor.indirectAmbientOcclusion);
             }
             ENDHLSL
         }
