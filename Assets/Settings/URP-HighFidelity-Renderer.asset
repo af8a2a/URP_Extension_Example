@@ -96,11 +96,11 @@ MonoBehaviour:
     Downsample: 1
     AfterOpaque: 1
     Source: 1
-    NormalSamples: 1
-    Intensity: 3.24
-    DirectLightingStrength: 0.364
-    Radius: 0.035
-    SampleCount: 14
+    NormalSamples: 2
+    Intensity: 1.24
+    DirectLightingStrength: 0.483
+    Radius: 0.2
+    SampleCount: 20
 --- !u!114 &-3686001903448193319
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -170,7 +170,7 @@ MonoBehaviour:
   - {fileID: 3461166638362642092}
   - {fileID: -5323435224801480069}
   m_RendererFeatureMap: 107240f40e5b193f0195c101971b49aabac34b1732461083c25939b1746b1476a315a03e4aa0b9d70912a1b4490d447cd9868e4fccb0d8cc61dca0484708ee47ddaebe1631865ef5acc60934b88808307bf2e728de5b1fb6
-  m_UseNativeRenderPass: 0
+  m_UseNativeRenderPass: 1
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
   shaders:
@@ -244,6 +244,7 @@ MonoBehaviour:
   m_Name: ScratchFeature
   m_EditorClassIdentifier: 
   m_Active: 1
+  ScratchMaterial: {fileID: 2100000, guid: 9f65a19445d1e6342a64047c1f892cd0, type: 2}
 --- !u!114 &4546765418592760336
 MonoBehaviour:
   m_ObjectHideFlags: 0
