@@ -303,8 +303,8 @@ MonoBehaviour:
   m_Name: GSR2Feature
   m_EditorClassIdentifier: 
   m_Active: 1
-  upscaledRatio: 1
-  minLerpContribution: 0.34
+  upscaledRatio: 0.282
+  minLerpContribution: 0.232
 --- !u!114 &8954296569333617161
 MonoBehaviour:
   m_ObjectHideFlags: 0

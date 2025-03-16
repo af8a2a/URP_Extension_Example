@@ -7,8 +7,8 @@ namespace Features.Snapdragon_GSR2
 {
     public class GSR2Feature : ScriptableRendererFeature
     {
-        public float upscaledRatio = 1;
-        public float minLerpContribution = 0.3f;
+        [Range(0.1f, 2.0f)] public float upscaledRatio = 1;
+        [Range(0f, 1.0f)] public float minLerpContribution = 0.3f;
 
         internal class GSR2Pass : ScriptableRenderPass
         {
@@ -93,7 +93,6 @@ namespace Features.Snapdragon_GSR2
 
 
                 var cmd = CommandBufferPool.Get("GSR2Pass");
-                Matrix4x4 currentViewProj = camera.nonJitteredProjectionMatrix * camera.worldToCameraMatrix;
 
                 RenderTextureDescriptor descriptor = renderingData.cameraData.cameraTargetDescriptor;
                 descriptor.msaaSamples = 1;
@@ -109,14 +108,12 @@ namespace Features.Snapdragon_GSR2
                 descriptor.graphicsFormat = GraphicsFormat.R8_UNorm;
                 RenderingUtils.ReAllocateIfNeeded(ref motionDepthClipRT, descriptor, name: "motionDepthClipRT");
 
-                Matrix4x4 clipToPrevClip = camera.previousViewProjectionMatrix * Matrix4x4.Inverse(currentViewProj);
-
                 // Calculate render sizes
 
                 // Generate jitter using the new method
                 Vector4 jitter = GetJitter();
 
-                material.SetMatrix("_ClipToPrevClip", clipToPrevClip);
+                // material.SetMatrix("_ClipToPrevClip", clipToPrevClip);
                 material.SetVector("_RenderSize", renderSize);
                 material.SetVector("_RenderSizeRcp", new Vector2(1f / renderSize.x, 1f / renderSize.y));
                 material.SetVector("_OutputSize", outputSize);
@@ -132,8 +129,8 @@ namespace Features.Snapdragon_GSR2
 
                 material.SetFloat("_Reset", frameCount == 0 ? 1f : 0f);
 
-                var output = outputRT[0];
-                var history = outputRT[1];
+                var output = outputRT[frameCount % 2];
+                var history = outputRT[(frameCount + 1) % 2];
 
                 Blitter.BlitCameraTexture(cmd, renderingData.cameraData.renderer.cameraColorTargetHandle,
                     motionDepthClipRT,
@@ -144,8 +141,7 @@ namespace Features.Snapdragon_GSR2
 
                 Blitter.BlitCameraTexture(cmd, renderingData.cameraData.renderer.cameraColorTargetHandle, output,
                     material, 1);
-                Blitter.BlitCameraTexture(cmd, renderingData.cameraData.renderer.cameraColorTargetHandle, history);
-                Blitter.BlitCameraTexture(cmd, output,renderingData.cameraData.renderer.cameraColorTargetHandle);
+                Blitter.BlitCameraTexture(cmd, output, renderingData.cameraData.renderer.cameraColorTargetHandle);
 
 
                 context.ExecuteCommandBuffer(cmd);

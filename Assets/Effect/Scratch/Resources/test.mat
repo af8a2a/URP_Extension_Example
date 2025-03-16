@@ -28,7 +28,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 6bbc3d855734b73488ce635e7b3d489b, type: 3}
+        m_Texture: {fileID: 2800000, guid: daca8ea94eee300478f944e2c3389972, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _TraceTexture:
@@ -36,7 +36,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _UnderTex:
-        m_Texture: {fileID: 2800000, guid: 66be034bb2ad0e644946ecd7e869a795, type: 3}
+        m_Texture: {fileID: 2800000, guid: 9a6760d227e3fee4cb9c99a94c4f3771, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
