@@ -69,6 +69,7 @@ MonoBehaviour:
   - {fileID: 6021617316971038843}
   - {fileID: 2254744145489006594}
   - {fileID: 3988037984815077074}
+  - {fileID: 2508213857842368521}
 --- !u!114 &849379129802519247
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -188,6 +189,49 @@ MonoBehaviour:
   Intensity:
     m_OverrideState: 1
     m_Value: 1
+--- !u!114 &2508213857842368521
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e5406a220b54d5dbdfbf0e07fd1f50f, type: 3}
+  m_Name: ScreenSpaceReflection
+  m_EditorClassIdentifier: 
+  active: 0
+  state:
+    m_OverrideState: 1
+    m_Value: 0
+  algorithm:
+    m_OverrideState: 1
+    m_Value: 0
+  minSmoothness:
+    m_OverrideState: 0
+    m_Value: 0.4
+  fadeSmoothness:
+    m_OverrideState: 0
+    m_Value: 0.6
+  edgeFade:
+    m_OverrideState: 1
+    m_Value: 0.1
+  thicknessMode:
+    m_OverrideState: 0
+    m_Value: 0
+  thickness:
+    m_OverrideState: 1
+    m_Value: 0.25
+  quality:
+    m_OverrideState: 0
+    m_Value: 0
+  maxStep:
+    m_OverrideState: 0
+    m_Value: 16
+  accumFactor:
+    m_OverrideState: 0
+    m_Value: 0.75
 --- !u!114 &3147227526466114598
 MonoBehaviour:
   m_ObjectHideFlags: 3

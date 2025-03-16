@@ -54,11 +54,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c2b0ab9567497145b125dde0ad3a563, type: 3}
   m_Name: VolumetricLightFeature
   m_EditorClassIdentifier: 
-  m_Active: 0
-  material: {fileID: 2100000, guid: dd07379497f21c54481980917993a88e, type: 2}
-  settings:
-    Intensity: 0.05
-    _StepTime: 40
+  m_Active: 1
   renderPassEvent: 550
 --- !u!114 &-5690443130314557284
 MonoBehaviour:
@@ -73,10 +69,6 @@ MonoBehaviour:
   m_Name: VolumetricLightFeature
   m_EditorClassIdentifier: 
   m_Active: 1
-  material: {fileID: 0}
-  settings:
-    Intensity: 0
-    _StepTime: 0
   renderPassEvent: 600
 --- !u!114 &-5323435224801480069
 MonoBehaviour:
@@ -114,6 +106,25 @@ MonoBehaviour:
   m_Name: FlimRenderPassFeature
   m_EditorClassIdentifier: 
   m_Active: 1
+--- !u!114 &-3490403499653477285
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19380b015bb0489385db4e35192cdebf, type: 3}
+  m_Name: VolumetricLightTutorial
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  setting:
+    passEvent: 550
+    shader: {fileID: 4800000, guid: b72739857e054157a0c4003258498955, type: 3}
+    intensity: 0.7
+    stepTimes: 16
+    blurRange: 1
 --- !u!114 &-2902112244124871261
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -261,7 +272,7 @@ MonoBehaviour:
   m_Active: 0
   DiffusionMaterial: {fileID: 2100000, guid: 7cba9c40a7ea2c746bb8a79e3371649b, type: 2}
   renderPassEvent: 600
-  Intensity: 0
+  Intensity: 0.368
 --- !u!114 &5183089323404221537
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -302,8 +313,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f12908ece53740d0b1afba30ca695a18, type: 3}
   m_Name: GSR2Feature
   m_EditorClassIdentifier: 
-  m_Active: 1
-  upscaledRatio: 1.199
+  m_Active: 0
+  upscaledRatio: 1.5
   minLerpContribution: 0.715
 --- !u!114 &8954296569333617161
 MonoBehaviour:

@@ -1,5 +1,24 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-868272668640538183
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24ef8b6238804c56ad23cf249538048b, type: 3}
+  m_Name: VolumetricLightVolume
+  m_EditorClassIdentifier: 
+  active: 1
+  intensity:
+    m_OverrideState: 1
+    m_Value: 0.633
+  sampleCount:
+    m_OverrideState: 1
+    m_Value: 30
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15,6 +34,8 @@ MonoBehaviour:
   components:
   - {fileID: 3983410969659473220}
   - {fileID: 5095632333089955248}
+  - {fileID: 7004572008406939626}
+  - {fileID: -868272668640538183}
 --- !u!114 &3983410969659473220
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -98,3 +119,46 @@ MonoBehaviour:
   displayMode:
     m_OverrideState: 1
     m_Value: 0
+--- !u!114 &7004572008406939626
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e5406a220b54d5dbdfbf0e07fd1f50f, type: 3}
+  m_Name: ScreenSpaceReflection
+  m_EditorClassIdentifier: 
+  active: 1
+  state:
+    m_OverrideState: 1
+    m_Value: 1
+  algorithm:
+    m_OverrideState: 1
+    m_Value: 0
+  minSmoothness:
+    m_OverrideState: 0
+    m_Value: 0.4
+  fadeSmoothness:
+    m_OverrideState: 1
+    m_Value: 0.6
+  edgeFade:
+    m_OverrideState: 1
+    m_Value: 0.1
+  thicknessMode:
+    m_OverrideState: 0
+    m_Value: 0
+  thickness:
+    m_OverrideState: 1
+    m_Value: 0.25
+  quality:
+    m_OverrideState: 0
+    m_Value: 0
+  maxStep:
+    m_OverrideState: 0
+    m_Value: 16
+  accumFactor:
+    m_OverrideState: 0
+    m_Value: 0.75
