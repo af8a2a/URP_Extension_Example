@@ -21,6 +21,7 @@ namespace Features.Snapdragon_GSR2
             private float upscaledRatio = 1;
             private float minLerpContribution = 0.3f;
 
+            
             private float Halton(int index, int baseN)
             {
                 float result = 0f;
@@ -86,7 +87,7 @@ namespace Features.Snapdragon_GSR2
             public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
             {
                 var camera = renderingData.cameraData.camera;
-                if (camera.cameraType == CameraType.Preview)
+                if (camera.cameraType == CameraType.Preview||!material)
                 {
                     return;
                 }
