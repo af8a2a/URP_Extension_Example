@@ -82,16 +82,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0eea7d8a15f148338018ec7ed3ec86b2, type: 3}
   m_Name: GroundTruthAmbientOcclusion
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   m_Shader: {fileID: 4800000, guid: 84009a12bf104e23baa1afc4097e0388, type: 3}
   m_Settings:
     Downsample: 1
-    AfterOpaque: 1
+    AfterOpaque: 0
     Source: 1
     NormalSamples: 2
-    Intensity: 1.24
-    DirectLightingStrength: 0.483
-    Radius: 0.2
+    Intensity: 0.97
+    DirectLightingStrength: 0.741
+    Radius: 0.41
     SampleCount: 20
 --- !u!114 &-3686001903448193319
 MonoBehaviour:
@@ -182,7 +182,7 @@ MonoBehaviour:
   - {fileID: -5323435224801480069}
   - {fileID: 8757769475160929191}
   m_RendererFeatureMap: 107240f40e5b193f0195c101971b49aabac34b1732461083c25939b1746b1476a315a03e4aa0b9d70912a1b4490d447cd9868e4fccb0d8cc61dca0484708ee47ddaebe1631865ef5acc60934b88808307bf2e728de5b1fb6a7f3b9dfefd88979
-  m_UseNativeRenderPass: 1
+  m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
   shaders:
@@ -284,6 +284,19 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ca32dec4987d644084938568cf1ef48, type: 3}
   m_Name: OcclusionOutlineFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &6376237105138815149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5495f09a19ba864e961d11903d4c606, type: 3}
+  m_Name: TAA
   m_EditorClassIdentifier: 
   m_Active: 1
 --- !u!114 &8508543744943413698

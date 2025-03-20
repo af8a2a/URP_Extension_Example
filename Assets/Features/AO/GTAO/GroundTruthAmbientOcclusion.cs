@@ -1,4 +1,5 @@
 ﻿using System;
+using Features.Filter.TemporalDenoiser;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -49,7 +50,6 @@ namespace Features.AO.GTAO
         // Private Fields
         private Material m_Material;
         private ScreenSpaceAmbientOcclusionPass m_SSAOPass = null;
-
         // Constants
         private const string k_ShaderName = "Hidden/Universal Render Pipeline/GroundTruthAmbientOcclusion";
         private const string k_OrthographicCameraKeyword = "_ORTHOGRAPHIC";
@@ -84,7 +84,7 @@ namespace Features.AO.GTAO
                 return;
             }
     
-            bool shouldAdd = m_SSAOPass.Setup(m_Settings, renderer, m_Material);
+            bool shouldAdd = m_SSAOPass.Setup(m_Settings,  m_Material);
             if (renderingData.cameraData.isPreviewCamera||renderingData.cameraData.postProcessEnabled==false)
             {
                 return;
@@ -93,6 +93,7 @@ namespace Features.AO.GTAO
             if (shouldAdd)
             {
                 renderer.EnqueuePass(m_SSAOPass);
+
             }
         }
 
@@ -141,7 +142,6 @@ namespace Features.AO.GTAO
             private Vector4[] m_CameraZExtent = new Vector4[2];
             private Matrix4x4[] m_CameraViewProjections = new Matrix4x4[2];
             private ProfilingSampler m_ProfilingSampler = new ProfilingSampler("GTAO");
-            private ScriptableRenderer m_Renderer = null;
 
             private RTHandle m_AOPassRT;
             private RTHandle m_BlurHorizonRT;
@@ -149,6 +149,7 @@ namespace Features.AO.GTAO
 
             private RTHandle m_FinalRT;
             private ScreenSpaceAmbientOcclusionSettings m_CurrentSettings;
+            private TemporalDenoiser _denoiser = null;
 
             // Constants
             private const string k_SSAOTextureName = "_ScreenSpaceOcclusionTexture";
@@ -179,16 +180,20 @@ namespace Features.AO.GTAO
                 AfterOpaque = 4
             }
 
+            public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
+            {
+                ConfigureInput(ScriptableRenderPassInput.Motion);
+            }
+
             internal ScreenSpaceAmbientOcclusionPass()
             {
                 m_CurrentSettings = new ScreenSpaceAmbientOcclusionSettings();
+                _denoiser = new TemporalDenoiser();
             }
 
-            internal bool Setup(ScreenSpaceAmbientOcclusionSettings featureSettings, ScriptableRenderer renderer,
-                Material material)
+            internal bool Setup(ScreenSpaceAmbientOcclusionSettings featureSettings,Material material)
             {
                 m_Material = material;
-                m_Renderer = renderer;
                 m_CurrentSettings = featureSettings;
 
                 ScreenSpaceAmbientOcclusionSettings.DepthSource source;
@@ -355,6 +360,7 @@ namespace Features.AO.GTAO
                     : RenderTextureFormat.ARGB32;
                 RenderingUtils.ReAllocateIfNeeded(ref m_FinalRT, descriptor, name: "FinalRT");
 
+                _denoiser.Setup(cmd,ref renderingData);
                 // Get temporary render textures
                 // m_Material.SetTexture(s_SSAOTexture1ID, m_AOPassRT);
                 // m_Material.SetTexture(s_SSAOTexture2ID, m_BlurRT);
@@ -396,7 +402,11 @@ namespace Features.AO.GTAO
                         (int)ShaderPasses.BlurVertical);
                     Blitter.BlitCameraTexture(cmd, m_BlurVerticalRT, m_FinalRT, m_Material,
                         (int)ShaderPasses.BlurFinal);
-
+                    
+                    // _denoiser.Setup(m_FinalRT);
+                    // _denoiser.CaptureHistory(cmd,m_FinalRT);
+                    //
+                    _denoiser.DoTemporalAntiAliasing(renderingData.cameraData,cmd,m_FinalRT);
                     // SetSourceSize(cmd, m_BlurHorizonRT.rt.descriptor);
                     // RenderAndSetBaseMap(cmd, m_SSAOTexture2Target, m_SSAOTexture3Target, ShaderPasses.BlurVertical);
                     // RenderAndSetBaseMap(cmd, m_SSAOTexture3Target, m_SSAOTextureFinalTarget,
