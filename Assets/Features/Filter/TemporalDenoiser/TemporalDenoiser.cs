@@ -92,7 +92,7 @@ namespace Features.Filter.TemporalDenoiser
             var denoiserSetting = stack.GetComponent<TemporalDenoiserSetting>();
 
             // Never draw in Preview
-            if (camera.cameraType == CameraType.Preview&& !cameraData.isSceneViewCamera)
+            if (camera.cameraType == CameraType.Preview)
                 return;
             var descriptor = new RenderTextureDescriptor(camera.scaledPixelWidth, camera.scaledPixelHeight,
                 RenderTextureFormat.DefaultHDR, 16);

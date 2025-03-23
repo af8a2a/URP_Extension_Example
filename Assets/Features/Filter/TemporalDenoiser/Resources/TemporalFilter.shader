@@ -131,6 +131,22 @@
         #endif
     }
 
+    inline half DisocclusionTest(float2 uvm1, float depth, float2 depth_prev) {
+
+    // disocclusion test
+    // https://developer.nvidia.com/sites/default/files/akamai/gamedev/files/gdc12/GDC12_Bavoil_Stable_SSAO_In_BF3_With_STF.pdf (Page 19)
+    // for fetching zi-1, use clamp-to-border to discard out-of-frame data, with borderZ = 0.f
+    // https://developer.nvidia.com/sites/default/files/akamai/gamedev/files/gdc12/GDC12_Bavoil_Stable_SSAO_In_BF3_With_STF.pdf (Page 39)
+    // if (uvm1.x < 0 || uvm1.y < 0 || uvm1.x > 1 || uvm1.y > 1) zm1 = 0;
+    // if (uvm1.x < 0 || uvm1.y < 0 || uvm1.x > 1 || uvm1.y > 1) => dot(step(half4(uvm1, 1, 1), half4(0, 0, uvm1)), 1) is 1 if out-of-frame, so
+    depth_prev *= 1.0 - dot(step(float4(uvm1, 1, 1), float4(0, 0, uvm1)), 1);
+    // relaxed disocclusion test: abs(1.0 - (z / zm1)) > 0.1 => 10% 
+    // float disocclusion = max(sign(abs(1.0 - (z / zm1)) - 0.1), 0.0);
+    float disocclusion = abs(1.0 - (depth / depth_prev)) > 0.1;
+
+    return disocclusion;
+}
+
     float4 Frag(VaryingsTAA input) : SV_Target
     {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
@@ -157,7 +173,7 @@
         ZTest Always ZWrite Off Cull Off
         Pass
         {
-            Name "Stop NaN"
+            Name "Temporal Filter"
             HLSLPROGRAM
             #pragma vertex VertexTAA
             #pragma fragment Frag
