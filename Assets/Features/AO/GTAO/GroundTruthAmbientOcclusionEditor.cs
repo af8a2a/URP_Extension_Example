@@ -107,7 +107,7 @@ namespace Features.AO.GTAO
             {
                 GroundTruthAmbientOcclusion ssaoFeature = (GroundTruthAmbientOcclusion)this.target;
                 UniversalRenderPipelineAsset pipelineAsset =
-                    (UniversalRenderPipelineAsset)GraphicsSettings.renderPipelineAsset;
+                    (UniversalRenderPipelineAsset)GraphicsSettings.defaultRenderPipeline;
 
                 if (ssaoFeature == null || pipelineAsset == null)
                     return false;

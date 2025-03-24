@@ -57,8 +57,7 @@ MonoBehaviour:
   m_Name: Global Volume Profile
   m_EditorClassIdentifier: 
   components:
-  - {fileID: 3983410969659473220}
-  - {fileID: -621012647693341367}
+  - {fileID: 6238202059926820811}
 --- !u!114 &3983410969659473220
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -141,6 +140,28 @@ MonoBehaviour:
     m_Value: {x: 1, y: 0.5, z: 0.03125}
   displayMode:
     m_OverrideState: 1
+    m_Value: 0
+--- !u!114 &6238202059926820811
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6de40c3d47391a4e89d129fbf4136c1, type: 3}
+  m_Name: TemporalDenoiserSetting
+  m_EditorClassIdentifier: 
+  active: 1
+  quality:
+    m_OverrideState: 0
+    m_Value: 0
+  spread:
+    m_OverrideState: 0
+    m_Value: 1
+  feedback:
+    m_OverrideState: 0
     m_Value: 0
 --- !u!114 &7004572008406939626
 MonoBehaviour:
