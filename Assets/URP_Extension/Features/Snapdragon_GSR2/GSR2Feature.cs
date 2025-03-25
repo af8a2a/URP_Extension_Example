@@ -113,7 +113,6 @@ namespace Features.Snapdragon_GSR2
 
                 // Generate jitter using the new method
                 Vector4 jitter = GetJitter();
-
                 // material.SetMatrix("_ClipToPrevClip", clipToPrevClip);
                 material.SetVector("_RenderSize", renderSize);
                 material.SetVector("_RenderSizeRcp", new Vector2(1f / renderSize.x, 1f / renderSize.y));
