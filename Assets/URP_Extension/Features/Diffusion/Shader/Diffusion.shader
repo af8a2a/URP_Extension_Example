@@ -101,7 +101,7 @@
         half4 blur = SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_LinearClamp, uv);
 
         color.rgb = 1.0 - (1.0 - color.rgb) * (1.0 - blur.rgb *_Intensity);
-        color.rgb = lerp(color.rgb, blur.rgb, _Intensity);
+        // color.rgb = lerp(color.rgb, blur.rgb, _Intensity);
 
         return color;
     }

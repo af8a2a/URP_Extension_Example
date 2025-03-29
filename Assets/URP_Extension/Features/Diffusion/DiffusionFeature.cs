@@ -1,25 +1,18 @@
-﻿using Unity.Collections;
-using UnityEngine;
-using UnityEngine.Experimental.Rendering;
+﻿using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.RenderGraphModule;
-using UnityEngine.Rendering.RenderGraphModule.Util;
 using UnityEngine.Rendering.Universal;
-using RenderGraphUtils = UnityEngine.Rendering.RenderGraphModule.Util.RenderGraphUtils;
 
 namespace Features.Diffusion
 {
     public class DiffusionFeature : ScriptableRendererFeature
     {
         private DiffusionPass _diffusionPass;
-        [SerializeField] private Material DiffusionMaterial;
-        public RenderPassEvent renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
-        [Range(0f, 1f)] public float Intensity;
-        [Range(0f, 1f)] public float BlurIntensity;
+        public RenderPassEvent renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
 
         public override void Create()
         {
-            _diffusionPass = new DiffusionPass(DiffusionMaterial, Intensity, BlurIntensity);
+            _diffusionPass = new DiffusionPass();
             _diffusionPass.renderPassEvent = renderPassEvent;
         }
 
@@ -33,102 +26,100 @@ namespace Features.Diffusion
     {
         private Material DiffusionMaterial;
 
-        private float intensity;
-        private float blurIntensity;
         private static int SourceTexture = Shader.PropertyToID("_SourceTexture");
         private static int IntensityID = Shader.PropertyToID("_Intensity");
         private static int BlurIntensityID = Shader.PropertyToID("_BlurIntensity");
+        private RenderTextureDescriptor TextureDescriptor;
 
-        public DiffusionPass(Material material, float intensity, float blurIntensity)
+        public DiffusionPass()
         {
             profilingSampler = new ProfilingSampler("Diffusion");
 
-            DiffusionMaterial = material;
-            this.intensity = intensity;
-            this.blurIntensity = blurIntensity;
+            DiffusionMaterial = new Material(Shader.Find("Diffusion"));
+            TextureDescriptor = new RenderTextureDescriptor(Screen.width, Screen.height,
+                RenderTextureFormat.RGB111110Float, 0);
         }
 
         class PassData
         {
             internal Material material;
-            internal float intensity;
-            internal float blurIntensity;
 
             internal TextureHandle cameraColor;
 
-            internal TextureHandle sourceTexture;
+            // internal TextureHandle sourceTexture;
             internal TextureHandle blurHTexture;
             internal TextureHandle blurVTexture;
-            internal TextureHandle targetTexture;
         }
 
-        private void InitDiffusionPassData(ref PassData data)
-        {
-            data.material = DiffusionMaterial;
-            data.intensity = intensity;
-        }
 
-        private void CreateRenderTextureHandles(RenderGraph renderGraph, UniversalCameraData cameraData,
-            out TextureHandle sourceTexture,
-            out TextureHandle blurHTexture,
-            out TextureHandle blurVTexture)
+        private void UpdateBlurSettings(DiffusionSetting setting)
         {
-            RenderTextureDescriptor desc = cameraData.cameraTargetDescriptor;
-            desc.colorFormat = RenderTextureFormat.RGB111110Float;
-            desc.depthStencilFormat = GraphicsFormat.None;
-            desc.msaaSamples = 1;
+            if (DiffusionMaterial == null) return;
 
-            sourceTexture = UniversalRenderer.CreateRenderGraphTexture(renderGraph, desc,
-                "Diffusion_Source", false, FilterMode.Bilinear);
-            blurHTexture = UniversalRenderer.CreateRenderGraphTexture(renderGraph, desc,
-                "Diffusion_BlurH", false, FilterMode.Bilinear);
-            blurVTexture = UniversalRenderer.CreateRenderGraphTexture(renderGraph, desc,
-                "Diffusion_BlurV", false, FilterMode.Bilinear);
+            // Use the Volume settings or the default settings if no Volume is set.
+            float blurIntensity = setting.blurIntensity.GetValue<float>();
+            float intensity = setting.intensity.GetValue<float>();
+            DiffusionMaterial.SetFloat(IntensityID, intensity);
+            DiffusionMaterial.SetFloat(BlurIntensityID, blurIntensity);
         }
 
         public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
             UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
             UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
+            if (resourceData.isActiveTargetBackBuffer)
+                return;
 
-            CreateRenderTextureHandles(renderGraph,
-                cameraData,
-                out var sourceTexture,
-                out var blurTextureH,
-                out var blurTextureV);
+
+            TextureDescriptor.width = cameraData.cameraTargetDescriptor.width;
+            TextureDescriptor.height = cameraData.cameraTargetDescriptor.height;
+            TextureDescriptor.depthBufferBits = 0;
+
+            TextureHandle cameraColor = resourceData.activeColorTexture;
+            TextureHandle blurTextureH =
+                UniversalRenderer.CreateRenderGraphTexture(renderGraph, TextureDescriptor, "_DiffusionHorizon", false);
+            TextureHandle blurTextureV =
+                UniversalRenderer.CreateRenderGraphTexture(renderGraph, TextureDescriptor, "_DiffusionVertical", false);
+
+            // Update the blur settings in the material
+
+            // This check is to avoid an error from the material preview in the scene
+            if (!cameraColor.IsValid() || !blurTextureH.IsValid() || !blurTextureV.IsValid())
+                return;
+            var volumeComponent =
+                VolumeManager.instance.stack.GetComponent<DiffusionSetting>();
+            if (volumeComponent == null || !volumeComponent.IsActive())
+            {
+                return;
+            }
+
+            UpdateBlurSettings(volumeComponent);
 
             using (var builder =
                    renderGraph.AddUnsafePass<PassData>("Diffusion", out var passData, profilingSampler))
             {
                 builder.AllowGlobalStateModification(true);
                 builder.AllowPassCulling(false);
-                InitDiffusionPassData(ref passData);
-                passData.sourceTexture = sourceTexture;
+                // passData.sourceTexture = cameraColor;
                 passData.blurHTexture = blurTextureH;
                 passData.blurVTexture = blurTextureV;
                 passData.material = DiffusionMaterial;
                 passData.cameraColor = resourceData.cameraColor;
-                passData.blurIntensity = blurIntensity;
-                passData.intensity = intensity;
-                passData.targetTexture = resourceData.cameraColor;
 
-                builder.UseTexture(passData.sourceTexture, AccessFlags.ReadWrite);
+                builder.UseTexture(passData.cameraColor, AccessFlags.ReadWrite);
                 builder.UseTexture(passData.blurHTexture, AccessFlags.ReadWrite);
                 builder.UseTexture(passData.blurVTexture, AccessFlags.ReadWrite);
-                builder.UseTexture(passData.targetTexture, AccessFlags.ReadWrite);
+
 
                 builder.SetRenderFunc((PassData data, UnsafeGraphContext rgContext) =>
                 {
                     var cmd = CommandBufferHelpers.GetNativeCommandBuffer(rgContext.cmd);
-
-                    Blitter.BlitCameraTexture(cmd, passData.cameraColor, data.sourceTexture);
-                    data.material.SetTexture(SourceTexture, data.sourceTexture);
-                    data.material.SetFloat(BlurIntensityID, data.blurIntensity);
-                    data.material.SetFloat(IntensityID, data.intensity);
-
-                    Blitter.BlitCameraTexture(cmd, data.sourceTexture, data.blurHTexture, data.material, 0);
+                    Blitter.BlitCameraTexture(cmd, data.cameraColor, data.blurHTexture, data.material, 0);
                     Blitter.BlitCameraTexture(cmd, data.blurHTexture, data.blurVTexture, data.material, 1);
-                    Blitter.BlitCameraTexture(cmd, data.blurVTexture, data.targetTexture, data.material,
+                    Blitter.BlitCameraTexture(cmd, data.cameraColor, data.blurHTexture);
+                    data.material.SetTexture(SourceTexture, data.blurHTexture);
+
+                    Blitter.BlitCameraTexture(cmd, data.blurVTexture, data.cameraColor, data.material,
                         2);
                 });
             }
