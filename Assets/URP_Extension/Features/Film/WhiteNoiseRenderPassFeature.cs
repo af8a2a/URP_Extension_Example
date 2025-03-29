@@ -1,15 +1,18 @@
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.RenderGraphModule;
+using UnityEngine.Rendering.RenderGraphModule.Util;
 using UnityEngine.Rendering.Universal;
+using RenderGraphUtils = UnityEngine.Rendering.RenderGraphModule.Util.RenderGraphUtils;
 
 public class WhiteNoiseRenderPassFeature : ScriptableRendererFeature
 {
     private const string ShaderName = "WhiteNoise";
 
-    
-    class CustomRenderPass : ScriptableRenderPass
+
+    class WhiteNoiseRenderPass : ScriptableRenderPass
     {
-        [SerializeField] private Material whiteNoiseMaterial;
+        private Material whiteNoiseMaterial;
 
         public Material WhiteNoiseMaterial
         {
@@ -24,55 +27,60 @@ public class WhiteNoiseRenderPassFeature : ScriptableRendererFeature
             }
         }
 
+        public WhiteNoiseRenderPass()
+        {
+            requiresIntermediateTexture = true;
+
+        }
+
         static class ShaderConstants
         {
             public static readonly int _Intensity = Shader.PropertyToID("_Intensity");
-            
         }
 
+        class PassData
+        {
+            Material material;
+        }
 
-
-        
-        // Here you can implement the rendering logic.
-        // Use <c>ScriptableRenderContext</c> to issue drawing commands or execute command buffers
-        // https://docs.unity3d.com/ScriptReference/Rendering.ScriptableRenderContext.html
-        // You don't have to call ScriptableRenderContext.submit, the render pipeline will call it at specific points in the pipeline.
-        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
+        public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
             var volume = VolumeManager.instance.stack.GetComponent<WhiteNoiseVolume>();
-            if (volume != null && volume.IsActive())
-            {
-                var cmd = CommandBufferPool.Get(ShaderName);
-                WhiteNoiseMaterial.SetFloat(ShaderConstants._Intensity,volume.Intensity.value);
-                Blit(cmd, ref renderingData, WhiteNoiseMaterial);
 
-                context.ExecuteCommandBuffer(cmd);
-                cmd.Release();
-            }
 
-        }
+            UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
+            WhiteNoiseMaterial.SetFloat(ShaderConstants._Intensity, volume.Intensity.value);
 
-        // Cleanup any allocated resources that were created during the execution of this render pass.
-        public override void OnCameraCleanup(CommandBuffer cmd)
-        {
+            TextureHandle source = resourceData.activeColorTexture;
+            var destinationDesc = renderGraph.GetTextureDesc(source);
+            destinationDesc.name = $"CameraColor-{nameof(WhiteNoiseRenderPass)}";
+            destinationDesc.clearBuffer = false;
+
+            TextureHandle destination = renderGraph.CreateTexture(destinationDesc);
+
+            RenderGraphUtils.BlitMaterialParameters para = new(source, destination, whiteNoiseMaterial,
+                0);
+            renderGraph.AddBlitPass(para, passName: nameof(WhiteNoiseRenderPass));
+            resourceData.cameraColor = destination;
+
         }
     }
 
-    CustomRenderPass m_ScriptablePass;
+    WhiteNoiseRenderPass whiteNoiseRenderPass;
 
     /// <inheritdoc/>
     public override void Create()
     {
-        m_ScriptablePass = new CustomRenderPass();
+        whiteNoiseRenderPass = new WhiteNoiseRenderPass();
 
         // Configures where the render pass should be injected.
-        m_ScriptablePass.renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
+        whiteNoiseRenderPass.renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
     }
 
     // Here you can inject one or multiple render passes in the renderer.
     // This method is called when setting up the renderer once per-camera.
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
-        renderer.EnqueuePass(m_ScriptablePass);
+        renderer.EnqueuePass(whiteNoiseRenderPass);
     }
 }
