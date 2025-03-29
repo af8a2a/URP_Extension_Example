@@ -52,7 +52,7 @@
             Name "Luma Preserving Mapping"
 
             HLSLPROGRAM
-            #pragma shader_feature SDR DISPLAYMODE_HDR10_SCRGB DISPLAYMODE_HDR10_2084
+            #pragma multi_compile  SDR DISPLAYMODE_HDR10_SCRGB DISPLAYMODE_HDR10_2084
 
             #pragma vertex Vert
             #pragma fragment Frag_LPM

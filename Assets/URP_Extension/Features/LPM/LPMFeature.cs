@@ -2,7 +2,10 @@ using System;
 using Features.LPM;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.RenderGraphModule;
+using UnityEngine.Rendering.RenderGraphModule.Util;
 using UnityEngine.Rendering.Universal;
+using RenderGraphUtils = UnityEngine.Rendering.RenderGraphModule.Util.RenderGraphUtils;
 
 public class LPMFeature : ScriptableRendererFeature
 {
@@ -40,9 +43,13 @@ public class LPMFeature : ScriptableRendererFeature
             }
         }
 
+        public LumaPreservingMapperPass()
+        {
+            profilingSampler = new ProfilingSampler(nameof(LumaPreservingMapperPass));
+            requiresIntermediateTexture = true;
+        }
 
-
-        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
+        public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
             var volume = VolumeManager.instance.stack.GetComponent<LPMVolume>();
             if (volume == null || !volume.IsActive())
@@ -50,13 +57,8 @@ public class LPMFeature : ScriptableRendererFeature
                 return;
             }
 
-            var camera = renderingData.cameraData.camera;
-
-            if (camera.cameraType == CameraType.Preview)
-            {
-                return;
-            }
-
+            UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
+            lpmMaterial.SetFloat(ShaderConstants._Intensity, volume.Intensity.value);
             lpmMaterial.SetFloat(ShaderConstants._SoftGap, volume.SoftGap.value);
             lpmMaterial.SetFloat(ShaderConstants._HdrMax, volume.HdrMax.value);
             lpmMaterial.SetFloat(ShaderConstants._LPMExposure, volume.LPMExposure.value);
@@ -67,21 +69,7 @@ public class LPMFeature : ScriptableRendererFeature
 
             lpmMaterial.SetVector(ShaderConstants._Saturation, volume.Saturation.value);
             lpmMaterial.SetVector(ShaderConstants._Crosstalk, volume.Crosstalk.value);
-            var cmd = CommandBufferPool.Get("Luma Preserving Mapping");
-            // if (HDROutputSettings.main.active)
-            // {
-            //     lpmMaterial.SetVector(ShaderConstants._DisplayMinMaxLuminance,
-            //         new Vector2(renderingData.cameraData.hdrDisplayInformation.minToneMapLuminance,
-            //             renderingData.cameraData.hdrDisplayInformation.maxToneMapLuminance));
-            // }
 
-            if (volume.displayMode.value != DisplayMode.SDR)
-            {
-                lpmMaterial.SetVector(ShaderConstants._DisplayMinMaxLuminance,
-                    new Vector2(renderingData.cameraData.hdrDisplayInformation.minToneMapLuminance,
-                        renderingData.cameraData.hdrDisplayInformation.maxToneMapLuminance));
-
-            }
             //now only support SDR
             lpmMaterial.DisableKeyword(lastKeyword);
             switch (volume.displayMode.value)
@@ -90,7 +78,7 @@ public class LPMFeature : ScriptableRendererFeature
                     lpmMaterial.EnableKeyword("SDR");
                     lastKeyword = "SDR";
                     break;
-                case DisplayMode.DISPLAYMODE_HDR10_SCRGB:
+                case DisplayMode.DISPLAYMODE_HDR10_SCRGB: 
                     lpmMaterial.EnableKeyword("DISPLAYMODE_HDR10_SCRGB");
                     lastKeyword = "DISPLAYMODE_HDR10_SCRGB";
                     break;
@@ -101,11 +89,17 @@ public class LPMFeature : ScriptableRendererFeature
             }
 
 
+            TextureHandle source = resourceData.activeColorTexture;
+            var destinationDesc = renderGraph.GetTextureDesc(source);
+            destinationDesc.name = $"CameraColor-{nameof(lpmMaterial)}";
+            destinationDesc.clearBuffer = false;
 
-            Blit(cmd, ref renderingData, lpmMaterial);
+            TextureHandle destination = renderGraph.CreateTexture(destinationDesc);
 
-            context.ExecuteCommandBuffer(cmd);
-            cmd.Release();
+            RenderGraphUtils.BlitMaterialParameters para = new(source, destination, lpmMaterial,
+                0);
+            renderGraph.AddBlitPass(para, passName: nameof(LumaPreservingMapperPass));
+            resourceData.cameraColor = destination;
         }
     }
 
@@ -125,10 +119,6 @@ public class LPMFeature : ScriptableRendererFeature
     // This method is called when setting up the renderer once per-camera.
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
-        var volume = VolumeManager.instance.stack.GetComponent<LPMVolume>();
-        if (volume != null && volume.IsActive())
-        {
-            renderer.EnqueuePass(m_ScriptablePass);
-        }
+        renderer.EnqueuePass(m_ScriptablePass);
     }
 }
