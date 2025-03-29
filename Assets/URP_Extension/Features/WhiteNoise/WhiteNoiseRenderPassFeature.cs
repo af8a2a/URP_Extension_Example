@@ -30,7 +30,6 @@ public class WhiteNoiseRenderPassFeature : ScriptableRendererFeature
         public WhiteNoiseRenderPass()
         {
             requiresIntermediateTexture = true;
-
         }
 
         static class ShaderConstants
@@ -47,6 +46,10 @@ public class WhiteNoiseRenderPassFeature : ScriptableRendererFeature
         {
             var volume = VolumeManager.instance.stack.GetComponent<WhiteNoiseVolume>();
 
+            if (volume == null || !volume.IsActive())
+            {
+                return;
+            }
 
             UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
             WhiteNoiseMaterial.SetFloat(ShaderConstants._Intensity, volume.Intensity.value);
@@ -62,7 +65,6 @@ public class WhiteNoiseRenderPassFeature : ScriptableRendererFeature
                 0);
             renderGraph.AddBlitPass(para, passName: nameof(WhiteNoiseRenderPass));
             resourceData.cameraColor = destination;
-
         }
     }
 
