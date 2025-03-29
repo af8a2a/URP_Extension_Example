@@ -1,36 +1,39 @@
 using Features.OcclusionOutline;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.Universal;
 
 public class OcclusionOutlineFeature : ScriptableRendererFeature
 {
     class CustomRenderPass : ScriptableRenderPass
     {
-        // This method is called before executing the render pass.
-        // It can be used to configure render targets and their clear state. Also to create temporary render target textures.
-        // When empty this render pass will render to the active camera render target.
-        // You should never call CommandBuffer.SetRenderTarget. Instead call <c>ConfigureTarget</c> and <c>ConfigureClear</c>.
-        // The render pipeline will ensure target setup and clearing happens in a performant manner.
+        public CustomRenderPass()
+        {
+            profilingSampler = new ProfilingSampler(nameof(OcclusionOutlineFeature));
+        }
 
-        ProfilingSampler m_ProfilingSampler = new ProfilingSampler(nameof(OcclusionOutlineFeature));
-
-        public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
+        class PassData
         {
         }
 
-        // Here you can implement the rendering logic.
-        // Use <c>ScriptableRenderContext</c> to issue drawing commands or execute command buffers
-        // https://docs.unity3d.com/ScriptReference/Rendering.ScriptableRenderContext.html
-        // You don't have to call ScriptableRenderContext.submit, the render pipeline will call it at specific points in the pipeline.
-        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
+        public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
-            var cmd = CommandBufferPool.Get("OcclusionOutline");
+            UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
 
-            OcclusionOutlineDrawSystem.Instance.Render(cmd);
+            using (var builder =
+                   renderGraph.AddRasterRenderPass<PassData>("Occlusion Outline", out var passData, profilingSampler))
+            {
+                builder.AllowGlobalStateModification(true);
+                builder.AllowPassCulling(false);
+                builder.SetRenderAttachment(resourceData.activeColorTexture, 0);
 
-            context.ExecuteCommandBuffer(cmd);
-            cmd.Release();
+                builder.SetRenderFunc((PassData data, RasterGraphContext rgContext) =>
+                {
+                    var cmd = rgContext.cmd;
+                    OcclusionOutlineDrawSystem.Instance.Render(cmd);
+                });
+            }
         }
     }
 

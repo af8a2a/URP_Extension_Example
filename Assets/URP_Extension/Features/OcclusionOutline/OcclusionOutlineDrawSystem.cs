@@ -74,7 +74,7 @@ namespace Features.OcclusionOutline
             renderData.Remove(obj);
         }
 
-        public void Render(CommandBuffer commandBuffer)
+        public void Render(RasterCommandBuffer commandBuffer)
         {
             foreach (var (renderers, material) in renderData.Values)
             {
