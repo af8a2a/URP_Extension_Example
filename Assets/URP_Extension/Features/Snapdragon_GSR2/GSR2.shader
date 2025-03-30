@@ -175,8 +175,9 @@
                     saturate(Hruv.y + (_JitterOffset.y * _OutputSizeRcp.y))
                 );
 
-                int2 InputPos = int2(Jitteruv * _RenderSize);
+                int2 InputPos = int2(Jitteruv * _OutputSize);
 
+                
                 float2 motion = SAMPLE_TEXTURE2D(_MotionVectorTexture, sampler_LinearClamp,
                                                  float4(Jitteruv, 0, 0)).xy;
 

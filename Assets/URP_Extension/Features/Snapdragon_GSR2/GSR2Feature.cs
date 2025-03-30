@@ -1,14 +1,14 @@
 ﻿using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.Universal;
+using UniversalCameraData = UnityEngine.Rendering.Universal.UniversalCameraData;
 
 namespace Features.Snapdragon_GSR2
 {
     public class GSR2Feature : ScriptableRendererFeature
     {
-        [Range(0.1f, 2.0f)] public float upscaledRatio = 1;
-        [Range(0f, 1.0f)] public float minLerpContribution = 0.3f;
 
         internal class GSR2Pass : ScriptableRenderPass
         {
@@ -18,10 +18,8 @@ namespace Features.Snapdragon_GSR2
             private RTHandle motionDepthClipRT;
             private RTHandle[] outputRT;
             private int frameCount = 0;
-            private float upscaledRatio = 1;
-            private float minLerpContribution = 0.3f;
 
-            
+
             private float Halton(int index, int baseN)
             {
                 float result = 0f;
@@ -51,6 +49,7 @@ namespace Features.Snapdragon_GSR2
 
                 outputRT = new RTHandle[2];
                 material = new Material(Shader.Find("PostProcessing/GSR2"));
+                requiresIntermediateTexture = true;
             }
 
             private Vector2 GetJitter()
@@ -58,20 +57,41 @@ namespace Features.Snapdragon_GSR2
                 return HaltonSequence[jitterIndex % HaltonSequence.Length];
             }
 
-            public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
+
+            class PassData
             {
-                ConfigureInput(ScriptableRenderPassInput.Motion | ScriptableRenderPassInput.Depth);
+                public Material material;
+
+                public TextureHandle cameraTexture;
+                public TextureHandle historyTexture;
+                public TextureHandle outputTexture;
+                public TextureHandle motionDepthClipTexture;
             }
 
-            public void Setup(float upscaledRatio, float minLerpContribution)
-            {
-                this.upscaledRatio = upscaledRatio;
-                this.minLerpContribution = minLerpContribution;
-            }
 
-            public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
+            void Setup(ref UniversalCameraData cameraData,GSR2 setting)
             {
-                var camera = renderingData.cameraData.camera;
+                ConfigureInput(ScriptableRenderPassInput.Depth|ScriptableRenderPassInput.Motion);
+
+                var upscaledRatio = setting.upscaledRatio.value;
+                var minLerpContribution = setting.minLerpContribution.value;
+                
+                RenderTextureDescriptor descriptor = cameraData.cameraTargetDescriptor;
+                descriptor.msaaSamples = 1;
+                descriptor.depthBufferBits = 0;
+                Vector2 renderSize = new Vector2(descriptor.width, descriptor.height);
+
+                var outputSize = new Vector2(descriptor.width, descriptor.height);
+                descriptor.width = Mathf.RoundToInt(descriptor.width / upscaledRatio);
+                descriptor.height = Mathf.RoundToInt(descriptor.height / upscaledRatio);
+                RenderingUtils.ReAllocateHandleIfNeeded(ref outputRT[0], descriptor, name: "outputRT_0");
+                RenderingUtils.ReAllocateHandleIfNeeded(ref outputRT[1], descriptor, name: "outputRT_1");
+
+                descriptor.graphicsFormat = GraphicsFormat.R8_UNorm;
+                RenderingUtils.ReAllocateHandleIfNeeded(ref motionDepthClipRT, descriptor, name: "motionDepthClipRT");
+
+
+                var camera = cameraData.camera;
                 if (!camera.orthographic)
                 {
                     camera.ResetProjectionMatrix();
@@ -82,38 +102,8 @@ namespace Features.Snapdragon_GSR2
                     jitProj.m12 += nextJitter.y / camera.pixelHeight;
                     camera.projectionMatrix = jitProj;
                 }
-            }
 
-            public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
-            {
-                var camera = renderingData.cameraData.camera;
-                if (camera.cameraType == CameraType.Preview||!material)
-                {
-                    return;
-                }
-
-
-                var cmd = CommandBufferPool.Get("GSR2Pass");
-
-                RenderTextureDescriptor descriptor = renderingData.cameraData.cameraTargetDescriptor;
-                descriptor.msaaSamples = 1;
-                descriptor.depthBufferBits = 0;
-                Vector2 renderSize = new Vector2(descriptor.width, descriptor.height);
-
-                var outputSize = new Vector2(descriptor.width, descriptor.height);
-                descriptor.width = Mathf.RoundToInt(descriptor.width / upscaledRatio);
-                descriptor.height = Mathf.RoundToInt(descriptor.height / upscaledRatio);
-                RenderingUtils.ReAllocateIfNeeded(ref outputRT[0], descriptor, name: "outputRT_0");
-                RenderingUtils.ReAllocateIfNeeded(ref outputRT[1], descriptor, name: "outputRT_1");
-
-                descriptor.graphicsFormat = GraphicsFormat.R8_UNorm;
-                RenderingUtils.ReAllocateIfNeeded(ref motionDepthClipRT, descriptor, name: "motionDepthClipRT");
-
-                // Calculate render sizes
-
-                // Generate jitter using the new method
                 Vector4 jitter = GetJitter();
-                // material.SetMatrix("_ClipToPrevClip", clipToPrevClip);
                 material.SetVector("_RenderSize", renderSize);
                 material.SetVector("_RenderSizeRcp", new Vector2(1f / renderSize.x, 1f / renderSize.y));
                 material.SetVector("_OutputSize", outputSize);
@@ -128,35 +118,69 @@ namespace Features.Snapdragon_GSR2
                 material.SetFloat("_MinLerpContribution", minLerpContribution);
 
                 material.SetFloat("_Reset", frameCount == 0 ? 1f : 0f);
+            }
+
+
+            public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
+            {
+                base.RecordRenderGraph(renderGraph, frameData);
+                var cameraData = frameData.Get<UniversalCameraData>();
+                
+                var setting = VolumeManager.instance.stack.GetComponent<GSR2>();
+                if (!setting || !setting.IsActive())
+                {
+                    return;
+                }
+
+                Setup(ref cameraData,setting);
+                var resourceData = frameData.Get<UniversalResourceData>();
+
 
                 var output = outputRT[frameCount % 2];
                 var history = outputRT[(frameCount + 1) % 2];
+                var motionDepthClip = renderGraph.ImportTexture(motionDepthClipRT);
+                var outputHandle = renderGraph.ImportTexture(output);
+                var historyHandle = renderGraph.ImportTexture(history);
+                using (var builder = renderGraph.AddUnsafePass<PassData>("GSR2", out var passData))
+                {
+                    passData.motionDepthClipTexture = motionDepthClip;
+                    passData.outputTexture = outputHandle;
+                    passData.historyTexture = historyHandle;
+                    passData.cameraTexture = resourceData.activeColorTexture;
+                    passData.material = material;
 
-                Blitter.BlitCameraTexture(cmd, renderingData.cameraData.renderer.cameraColorTargetHandle,
-                    motionDepthClipRT,
-                    material, 0);
+                    builder.UseTexture(passData.motionDepthClipTexture, AccessFlags.ReadWrite);
+                    builder.UseTexture(passData.outputTexture, AccessFlags.ReadWrite);
+                    builder.UseTexture(passData.historyTexture, AccessFlags.ReadWrite);
+                    builder.UseTexture(passData.cameraTexture, AccessFlags.ReadWrite);
 
-                material.SetTexture("_PrevHistory", history);
-                material.SetTexture("MotionDepthClipAlphaBuffer", motionDepthClipRT);
+                    builder.SetRenderFunc((PassData data, UnsafeGraphContext rgContext) =>
+                    {
+                        var cmd = CommandBufferHelpers.GetNativeCommandBuffer(rgContext.cmd);
+                        var material = data.material;
 
-                Blitter.BlitCameraTexture(cmd, renderingData.cameraData.renderer.cameraColorTargetHandle, output,
-                    material, 1);
-                Blitter.BlitCameraTexture(cmd, output, renderingData.cameraData.renderer.cameraColorTargetHandle);
+                        Blitter.BlitCameraTexture(cmd, data.cameraTexture,
+                            data.motionDepthClipTexture,
+                            material, 0);
 
+                        material.SetTexture("_PrevHistory", history);
+                        material.SetTexture("MotionDepthClipAlphaBuffer", data.motionDepthClipTexture);
 
-                context.ExecuteCommandBuffer(cmd);
-                cmd.Release();
+                        Blitter.BlitCameraTexture(cmd, data.cameraTexture, data.outputTexture,
+                            material, 1);
+                        // Blitter.BlitCameraTexture(cmd, data.outputTexture, data.cameraTexture);
+                    });
+                }
+
+                resourceData.cameraColor = outputHandle;
                 frameCount++;
                 jitterIndex++;
             }
+
         }
 
         GSR2Pass mGsr2Pass;
 
-        public override void SetupRenderPasses(ScriptableRenderer renderer, in RenderingData renderingData)
-        {
-            mGsr2Pass.Setup(upscaledRatio, minLerpContribution);
-        }
 
         public override void Create()
         {

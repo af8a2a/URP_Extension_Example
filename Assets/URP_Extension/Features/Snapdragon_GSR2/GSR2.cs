@@ -11,7 +11,6 @@ namespace Features.Snapdragon_GSR2
         public ClampedFloatParameter minLerpContribution = new ClampedFloatParameter(1f, 0f, 1f);
 
         public BoolParameter enabled = new BoolParameter(false);
-        [Tooltip("Feedback")] public ClampedFloatParameter feedback = new ClampedFloatParameter(0.0f, 0f, 1f);
 
         public bool IsActive() => enabled.value == true;
     }
