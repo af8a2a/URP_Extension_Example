@@ -28,7 +28,7 @@ public class UIScratch : MonoBehaviour, IDragHandler, IPointerEnterHandler, IPoi
     private Graphic m_Graphic;
     private Image _image;
     int rendererId = -1;
-    private bool isForceUpdate = true;
+    private bool isForceUpdate = false;
 
     public Graphic graphic
     {
@@ -75,7 +75,7 @@ public class UIScratch : MonoBehaviour, IDragHandler, IPointerEnterHandler, IPoi
         return false;
     }
 
-    void Update()
+    void LateUpdate()
     {
         if (!_material || _material.shader.name != "UI_Scratch")
             return;
@@ -83,6 +83,7 @@ public class UIScratch : MonoBehaviour, IDragHandler, IPointerEnterHandler, IPoi
         if (rendererId == -1)
         {
             rendererId = UIScratchEffectSystem.instance.Regist(this);
+            IsDirty();
             return;
         }
 
@@ -94,7 +95,7 @@ public class UIScratch : MonoBehaviour, IDragHandler, IPointerEnterHandler, IPoi
             UIScratchEffectSystem.instance.UpdateTracePos(rendererId, localPos);
         }
 
-        if (IsDirty() || isForceUpdate)
+        if (IsDirty() )
         {
             UIScratchEffectSystem.instance.UpdateData(rendererId, this, true);
             _material.SetTexture("_TraceTexture", UIScratchEffectSystem.instance.GetRenderTextureByID(rendererId));

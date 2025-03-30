@@ -20,11 +20,11 @@ namespace Effect.Scratch
         }
 
 
-        private Material _snowMarkDrawMaterial;
+        private Material _markDrawMaterial;
 
-        public void InitSnowMarkDrawMaterial(Material snowMarkDrawMaterial)
+        private Material MarkDrawMaterial
         {
-            _snowMarkDrawMaterial = snowMarkDrawMaterial;
+            get { return _markDrawMaterial ??= new Material(Shader.Find("ScratchMask")); }
         }
 
 
@@ -33,7 +33,7 @@ namespace Effect.Scratch
         int traceRTId = Shader.PropertyToID("_TraceTexture");
         RenderTexture traceRT;
 
-        public class Data
+        public class ScratchData
         {
             public Material material;
             public Vector3 scale;
@@ -42,7 +42,7 @@ namespace Effect.Scratch
             public RenderTexture traceRT;
         }
 
-        Dictionary<int, Data> dataMap = new();
+        Dictionary<int, ScratchData> dataMap = new();
 
 
         private Mesh _quad;
@@ -81,20 +81,13 @@ namespace Effect.Scratch
         #endregion
 
 
-        #region 监听
-
         int index = 0;
 
         public int Regist(UIScratch uiScratch)
         {
-            if (_snowMarkDrawMaterial == null)
+            var data = new ScratchData
             {
-                return -1;
-            }
-
-            var data = new Data
-            {
-                material = new Material(_snowMarkDrawMaterial),
+                material = new Material(MarkDrawMaterial),
                 scale = new Vector3(uiScratch.scale.x, uiScratch.scale.y, 1f),
                 dirty = false,
                 traceRT = GetRenderTexture(),
@@ -141,8 +134,6 @@ namespace Effect.Scratch
             dataMap[id].material.SetVector("_TracePos", pos);
         }
 
-        #endregion
-
 
         #region Render
 
@@ -169,51 +160,43 @@ namespace Effect.Scratch
 
         public void RenderMask(CommandBuffer cmd)
         {
+
             if ((dataMap == null || dataMap.Count == 0))
                 return;
 
 
+
             if (dataMap != null && dataMap.Count > 0)
             {
+
                 foreach (var i in dataMap)
                 {
+
                     //draw only dirty
-                    Data data = i.Value;
+                    ScratchData scratchData = i.Value;
                     if (i.Value.dirty)
                     {
                         i.Value.dirty = false;
-                    }
-                    else
-                    {
-                        continue;
-                    }
-
-                    cmd.SetRenderTarget(data.traceRT, RenderBufferLoadAction.Load, RenderBufferStoreAction.Store);
-                    //clear not need draw
-                    if (data.newRT)
-                    {
-                        data.newRT = false;
-                        cmd.ClearRenderTarget(false, true, Color.black);
-                        return;
-                    }
+                        cmd.SetRenderTarget(scratchData.traceRT, RenderBufferLoadAction.Load, RenderBufferStoreAction.Store);
+                        //clear not need draw
+                        if (scratchData.newRT)
+                        {
+                            scratchData.newRT = false;
+                            cmd.ClearRenderTarget(false, true, Color.black);
+                            return;
+                        }
 
 
-                    data.material.SetTexture(traceRTId, traceRT);
-                    var matrix = Matrix4x4.Scale(data.scale);
-                    cmd.DrawMesh(quad, matrix, data.material, 0, 0);
+                        scratchData.material.SetTexture(traceRTId, traceRT);
+                        var matrix = Matrix4x4.Scale(scratchData.scale);
+                        cmd.DrawMesh(quad, matrix, scratchData.material, 0, 0);
+
+                    }
+                    
                 }
             }
         }
 
         #endregion
-
-        // public void Cleanup(CommandBuffer cmd)
-        // {
-        //     if ((dataMap == null || dataMap.Count == 0))
-        //     {
-        //         if (traceRT != null)
-        //             traceRT.Release();
-        //     }
-        // }
     }
 }

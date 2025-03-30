@@ -1,4 +1,6 @@
-﻿using UnityEngine.Rendering;
+﻿using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.Universal;
 
 namespace Effect.Scratch
@@ -11,16 +13,29 @@ namespace Effect.Scratch
             renderPassEvent = evt;
         }
 
-        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
+        class PassData
         {
-            var cmd = CommandBufferPool.Get("ScratchPass");
+        }
 
-            using (new ProfilingScope(cmd, profilingSampler))
+        public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
+        {
+            
+
+            UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
+
+            using (var builder =
+                   renderGraph.AddUnsafePass<PassData>("ScratchPass", out var passData, profilingSampler))
             {
-                UIScratchEffectSystem.instance.RenderMask(cmd);
-            }
+                builder.AllowGlobalStateModification(true);
+                builder.AllowPassCulling(false);
 
-            context.ExecuteCommandBuffer(cmd);
+                builder.SetRenderFunc((PassData data, UnsafeGraphContext rgContext) =>
+                {
+
+                    var cmd =CommandBufferHelpers.GetNativeCommandBuffer(rgContext.cmd) ;
+                    UIScratchEffectSystem.instance.RenderMask(cmd);
+                });
+            }
         }
     }
 }

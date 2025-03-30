@@ -123,7 +123,6 @@ namespace Features.Snapdragon_GSR2
 
             public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
             {
-                base.RecordRenderGraph(renderGraph, frameData);
                 var cameraData = frameData.Get<UniversalCameraData>();
                 
                 var setting = VolumeManager.instance.stack.GetComponent<GSR2>();
