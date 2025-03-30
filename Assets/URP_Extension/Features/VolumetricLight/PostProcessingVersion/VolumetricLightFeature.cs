@@ -2,86 +2,153 @@ using System;
 using Features.VolumetricLight;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Playables;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.RenderGraphModule;
+using UnityEngine.Rendering.RenderGraphModule.Util;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.Serialization;
+using RenderGraphUtils = UnityEngine.Rendering.RenderGraphModule.Util.RenderGraphUtils;
 
 
 public class VolumetricLightFeature : ScriptableRendererFeature
 {
-    class CustomRenderPass : ScriptableRenderPass
+    class VolumetricLightPass : ScriptableRenderPass
     {
-        private Material _material;
-        private RTHandle RT0;
-        private RTHandle RT1;
-        private bool dirty = false;
-        // private VolumetricLightSettings _settings;
+        private Material _material = new(Shader.Find("Volumetric Light"));
 
-        public CustomRenderPass()
+        private RenderTextureDescriptor TextureDescriptor = new(Screen.width, Screen.height,
+            RenderTextureFormat.RGB111110Float, 0);
+
+        public VolumetricLightPass()
         {
-            _material = new Material(Shader.Find("Volumetric Light"));
+            profilingSampler = new ProfilingSampler(nameof(VolumetricLightPass));
         }
 
-        // Here you can implement the rendering logic.
-        // Use <c>ScriptableRenderContext</c> to issue drawing commands or execute command buffers
-        // https://docs.unity3d.com/ScriptReference/Rendering.ScriptableRenderContext.html
-        // You don't have to call ScriptableRenderContext.submit, the render pipeline will call it at specific points in the pipeline.
-        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
+        class PassData
+        {
+            internal Material material;
+
+            internal TextureHandle cameraColor;
+
+            internal TextureHandle volumeTexture;
+            internal TextureHandle blurHTexture;
+            internal TextureHandle blurVTexture;
+        }
+
+        public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
             if (_material == null)
             {
                 return;
             }
 
-            var camera = renderingData.cameraData.camera;
-
-            if (camera.cameraType == CameraType.Preview)
-            {
-                return;
-            }
-
+            var cameraData = frameData.Get<UniversalCameraData>();
+            var resourceData = frameData.Get<UniversalResourceData>();
             var setting = VolumeManager.instance.stack.GetComponent<VolumetricLightVolume>();
-            if (setting == null)
+            if (setting == null || !setting.IsActive())
             {
                 return;
             }
 
-            var cmd = CommandBufferPool.Get("VolumetricLight");
+            TextureDescriptor.width = cameraData.cameraTargetDescriptor.width;
+            TextureDescriptor.height = cameraData.cameraTargetDescriptor.height;
+            TextureDescriptor.depthBufferBits = 0;
 
-            var desc = new RenderTextureDescriptor(renderingData.cameraData.cameraTargetDescriptor.width,
-                renderingData.cameraData.cameraTargetDescriptor.height, RenderTextureFormat.RGB111110Float);
+            TextureHandle cameraColor = resourceData.activeColorTexture;
+            TextureHandle blurTextureH =
+                UniversalRenderer.CreateRenderGraphTexture(renderGraph, TextureDescriptor, "_VolumetricLightHorizon",
+                    false);
+            TextureHandle blurTextureV =
+                UniversalRenderer.CreateRenderGraphTexture(renderGraph, TextureDescriptor, "_VolumetricLightVertical",
+                    false);
+
 
             _material.SetFloat("_StepTime", setting.sampleCount.value);
             _material.SetFloat("_Intensity", setting.intensity.value);
 
-            RenderingUtils.ReAllocateIfNeeded(ref RT0, desc, name: "VolumetricLightBlurHorizonRT");
-            RenderingUtils.ReAllocateIfNeeded(ref RT1, desc, name: "VolumetricLightBlurVerticalRT");
+            using (var builder =
+                   renderGraph.AddUnsafePass<PassData>("VolumetricLight", out var passData, profilingSampler))
+            {
+                builder.AllowGlobalStateModification(true);
+                builder.AllowPassCulling(false);
+                // passData.sourceTexture = cameraColor;
+                passData.blurHTexture = blurTextureH;
+                passData.blurVTexture = blurTextureV;
+                passData.material = _material;
+                passData.cameraColor = resourceData.cameraColor;
+
+                builder.UseTexture(passData.cameraColor, AccessFlags.ReadWrite);
+                builder.UseTexture(passData.blurHTexture, AccessFlags.ReadWrite);
+                builder.UseTexture(passData.blurVTexture, AccessFlags.ReadWrite);
 
 
-            Blitter.BlitTexture(cmd, renderingData.cameraData.renderer.cameraColorTargetHandle, RT1, _material, 0);
-            Blit(cmd, RT1, RT0, _material, 1);
-            Blit(cmd, RT0, RT1, _material, 2);
-            Blit(cmd, RT1, renderingData.cameraData.renderer.cameraColorTargetHandle, _material, 3);
-
-            context.ExecuteCommandBuffer(cmd);
-            CommandBufferPool.Release(cmd);
+                builder.SetRenderFunc((PassData data, UnsafeGraphContext rgContext) =>
+                {
+                    var cmd = CommandBufferHelpers.GetNativeCommandBuffer(rgContext.cmd);
+                    Blitter.BlitCameraTexture(cmd, data.cameraColor, data.blurHTexture, data.material, 0);
+                    Blitter.BlitCameraTexture(cmd, data.blurHTexture, data.blurVTexture, data.material, 1);
+                    Blitter.BlitCameraTexture(cmd, data.blurVTexture, data.blurHTexture, data.material, 2);
+                    Blitter.BlitCameraTexture(cmd, data.blurHTexture, data.cameraColor, data.material, 3);
+                });
+            }
         }
 
-        // Cleanup any allocated resources that were created during the execution of this render pass.
-        public override void OnCameraCleanup(CommandBuffer cmd)
-        {
-        }
+        //     // Here you can implement the rendering logic.
+        //     // Use <c>ScriptableRenderContext</c> to issue drawing commands or execute command buffers
+        //     // https://docs.unity3d.com/ScriptReference/Rendering.ScriptableRenderContext.html
+        //     // You don't have to call ScriptableRenderContext.submit, the render pipeline will call it at specific points in the pipeline.
+        //     public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
+        //     {
+        //         if (_material == null)
+        //         {
+        //             return;
+        //         }
+        //
+        //         var camera = renderingData.cameraData.camera;
+        //
+        //         if (camera.cameraType == CameraType.Preview)
+        //         {
+        //             return;
+        //         }
+        //
+        //         var setting = VolumeManager.instance.stack.GetComponent<VolumetricLightVolume>();
+        //         if (setting == null)
+        //         {
+        //             return;
+        //         }
+        //
+        //         var cmd = CommandBufferPool.Get("VolumetricLight");
+        //
+        //         var desc = new RenderTextureDescriptor(renderingData.cameraData.cameraTargetDescriptor.width,
+        //             renderingData.cameraData.cameraTargetDescriptor.height, RenderTextureFormat.RGB111110Float);
+        //
+        //         _material.SetFloat("_StepTime", setting.sampleCount.value);
+        //         _material.SetFloat("_Intensity", setting.intensity.value);
+        //
+        //         RenderingUtils.ReAllocateIfNeeded(ref RT0, desc, name: "VolumetricLightBlurHorizonRT");
+        //         RenderingUtils.ReAllocateIfNeeded(ref RT1, desc, name: "VolumetricLightBlurVerticalRT");
+        //
+        //
+        //         Blitter.BlitTexture(cmd, renderingData.cameraData.renderer.cameraColorTargetHandle, RT1, _material, 0);
+        //         Blit(cmd, RT1, RT0, _material, 1);
+        //         Blit(cmd, RT0, RT1, _material, 2);
+        //         Blit(cmd, RT1, renderingData.cameraData.renderer.cameraColorTargetHandle, _material, 3);
+        //
+        //         context.ExecuteCommandBuffer(cmd);
+        //         CommandBufferPool.Release(cmd);
+        //     }
     }
 
     public RenderPassEvent renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
 
-    CustomRenderPass m_ScriptablePass;
+    VolumetricLightPass m_ScriptablePass;
 
 
     /// <inheritdoc/>
     public override void Create()
     {
-        m_ScriptablePass = new CustomRenderPass();
+        m_ScriptablePass = new VolumetricLightPass();
 
         // Configures where the render pass should be injected.
         m_ScriptablePass.renderPassEvent = renderPassEvent;

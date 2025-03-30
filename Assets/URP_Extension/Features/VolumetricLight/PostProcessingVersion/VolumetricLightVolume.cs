@@ -12,9 +12,5 @@ namespace Features.VolumetricLight
             return intensity.value > 0;
         }
 
-        public bool IsTileCompatible()
-        {
-            return false;
-        }
     }
 }

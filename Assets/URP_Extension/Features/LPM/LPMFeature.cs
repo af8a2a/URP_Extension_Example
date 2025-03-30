@@ -58,6 +58,7 @@ public class LPMFeature : ScriptableRendererFeature
             }
 
             UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
+            UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
             lpmMaterial.SetFloat(ShaderConstants._Intensity, volume.Intensity.value);
             lpmMaterial.SetFloat(ShaderConstants._SoftGap, volume.SoftGap.value);
             lpmMaterial.SetFloat(ShaderConstants._HdrMax, volume.HdrMax.value);
@@ -69,7 +70,16 @@ public class LPMFeature : ScriptableRendererFeature
 
             lpmMaterial.SetVector(ShaderConstants._Saturation, volume.Saturation.value);
             lpmMaterial.SetVector(ShaderConstants._Crosstalk, volume.Crosstalk.value);
+            if (cameraData.isHDROutputActive)
+            {
+                if (volume.displayMode.value != DisplayMode.SDR)
+                {
+                    lpmMaterial.SetVector(ShaderConstants._DisplayMinMaxLuminance,
+                        new Vector2(cameraData.hdrDisplayInformation.minToneMapLuminance,
+                            cameraData.hdrDisplayInformation.maxToneMapLuminance));
+                }
 
+            }
             //now only support SDR
             lpmMaterial.DisableKeyword(lastKeyword);
             switch (volume.displayMode.value)
