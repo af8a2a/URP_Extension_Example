@@ -1,5 +1,92 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-7379238737743196520
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b2db86121404754db890f4c8dfe81b2, type: 3}
+  m_Name: Bloom
+  m_EditorClassIdentifier: 
+  active: 1
+  skipIterations:
+    m_OverrideState: 1
+    m_Value: 1
+  threshold:
+    m_OverrideState: 1
+    m_Value: 0.9
+  intensity:
+    m_OverrideState: 1
+    m_Value: 7.18
+  scatter:
+    m_OverrideState: 1
+    m_Value: 0.543
+  clamp:
+    m_OverrideState: 1
+    m_Value: 65472
+  tint:
+    m_OverrideState: 1
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
+  highQualityFiltering:
+    m_OverrideState: 1
+    m_Value: 0
+  downscale:
+    m_OverrideState: 0
+    m_Value: 0
+  maxIterations:
+    m_OverrideState: 0
+    m_Value: 6
+  dirtTexture:
+    m_OverrideState: 0
+    m_Value: {fileID: 0}
+    dimension: 1
+  dirtIntensity:
+    m_OverrideState: 0
+    m_Value: 0
+--- !u!114 &-5213450637162812569
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97c23e3b12dc18c42a140437e53d3951, type: 3}
+  m_Name: Tonemapping
+  m_EditorClassIdentifier: 
+  active: 0
+  mode:
+    m_OverrideState: 1
+    m_Value: 2
+  neutralHDRRangeReductionMode:
+    m_OverrideState: 0
+    m_Value: 2
+  acesPreset:
+    m_OverrideState: 1
+    m_Value: 3
+  hueShiftAmount:
+    m_OverrideState: 1
+    m_Value: 0
+  detectPaperWhite:
+    m_OverrideState: 1
+    m_Value: 0
+  paperWhite:
+    m_OverrideState: 1
+    m_Value: 300
+  detectBrightnessLimits:
+    m_OverrideState: 1
+    m_Value: 1
+  minNits:
+    m_OverrideState: 1
+    m_Value: 0.005
+  maxNits:
+    m_OverrideState: 1
+    m_Value: 1000
 --- !u!114 &-4900057829681635885
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -22,6 +109,41 @@ MonoBehaviour:
   feedback:
     m_OverrideState: 0
     m_Value: 0
+--- !u!114 &-3972751328780206285
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24ef8b6238804c56ad23cf249538048b, type: 3}
+  m_Name: VolumetricLightVolume
+  m_EditorClassIdentifier: 
+  active: 0
+  intensity:
+    m_OverrideState: 1
+    m_Value: 0.175
+  sampleCount:
+    m_OverrideState: 1
+    m_Value: 64
+--- !u!114 &-3362228198130784316
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6bd81037f93646c8bb736cd37645c574, type: 3}
+  m_Name: WhiteNoiseVolume
+  m_EditorClassIdentifier: 
+  active: 0
+  Intensity:
+    m_OverrideState: 1
+    m_Value: 1
 --- !u!114 &-621012647693341367
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -44,6 +166,28 @@ MonoBehaviour:
   feedback:
     m_OverrideState: 0
     m_Value: 0
+--- !u!114 &-394219664679543303
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ed0927853d14104be46dd02848f32a3, type: 3}
+  m_Name: GSR2
+  m_EditorClassIdentifier: 
+  active: 0
+  upscaledRatio:
+    m_OverrideState: 1
+    m_Value: 0.294
+  minLerpContribution:
+    m_OverrideState: 1
+    m_Value: 0.808
+  enabled:
+    m_OverrideState: 1
+    m_Value: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57,7 +201,61 @@ MonoBehaviour:
   m_Name: Global Volume Profile
   m_EditorClassIdentifier: 
   components:
-  - {fileID: 6238202059926820811}
+  - {fileID: -5213450637162812569}
+  - {fileID: -7379238737743196520}
+  - {fileID: 4024437580374791681}
+  - {fileID: -3362228198130784316}
+  - {fileID: -3972751328780206285}
+  - {fileID: -394219664679543303}
+  - {fileID: 2694285367520836164}
+--- !u!114 &422740205753480726
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ee3de9f1758424ab8a4146e8b430146, type: 3}
+  m_Name: GSR2Setting
+  m_EditorClassIdentifier: 
+  active: 1
+  <displayName>k__BackingField: 
+  enable:
+    <debugId>k__BackingField: enable
+    m_OverrideState: 1
+    m_Value: 1
+  scale:
+    <debugId>k__BackingField: scale
+    m_OverrideState: 1
+    m_Value: 1.011
+  minLerpContribution:
+    <debugId>k__BackingField: minLerpContribution
+    m_OverrideState: 1
+    m_Value: 0.502
+--- !u!114 &2694285367520836164
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: GrabScreenBlur
+  m_EditorClassIdentifier: URP_Extension::GrabScreenBlur
+  active: 1
+  blurAmount:
+    m_OverrideState: 1
+    m_Value: 3
+  blurIntensity:
+    m_OverrideState: 1
+    m_Value: 0.304
+  enabled:
+    m_OverrideState: 1
+    m_Value: 1
 --- !u!114 &3983410969659473220
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -98,6 +296,28 @@ MonoBehaviour:
   maxNits:
     m_OverrideState: 1
     m_Value: 1563
+--- !u!114 &4024437580374791681
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb472bb2ae92960469cac3808e741e09, type: 3}
+  m_Name: DiffusionVolumeComponent
+  m_EditorClassIdentifier: 
+  active: 0
+  intensity:
+    m_OverrideState: 1
+    m_Value: 1
+  blurIntensity:
+    m_OverrideState: 1
+    m_Value: 1
+  enabled:
+    m_OverrideState: 1
+    m_Value: 1
 --- !u!114 &5095632333089955248
 MonoBehaviour:
   m_ObjectHideFlags: 3

@@ -1,5 +1,49 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8837896672387194511
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ee3de9f1758424ab8a4146e8b430146, type: 3}
+  m_Name: GSR2Setting
+  m_EditorClassIdentifier: 
+  active: 1
+  enable:
+    m_OverrideState: 1
+    m_Value: 1
+  scale:
+    m_OverrideState: 1
+    m_Value: 1.369
+  minLerpContribution:
+    m_OverrideState: 1
+    m_Value: 0.709
+--- !u!114 &-7491511134333137893
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: GrabScreenBlur
+  m_EditorClassIdentifier: URP_Extension::GrabScreenBlur
+  active: 1
+  blurAmount:
+    m_OverrideState: 1
+    m_Value: 3
+  blurIntensity:
+    m_OverrideState: 1
+    m_Value: 0.627
+  enabled:
+    m_OverrideState: 1
+    m_Value: 1
 --- !u!114 &-5402132730149920065
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -52,6 +96,55 @@ MonoBehaviour:
   intensity:
     m_OverrideState: 1
     m_Value: 0
+--- !u!114 &-149540311801507145
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00b5265c810b432fa2bd33642d3e9cde, type: 3}
+  m_Name: ScreenSpaceReflection
+  m_EditorClassIdentifier: 
+  active: 1
+  state:
+    m_OverrideState: 1
+    m_Value: 1
+  algorithm:
+    m_OverrideState: 1
+    m_Value: 0
+  minSmoothness:
+    m_OverrideState: 1
+    m_Value: 0.157
+  fadeSmoothness:
+    m_OverrideState: 1
+    m_Value: 0.7
+  edgeFade:
+    m_OverrideState: 1
+    m_Value: 0.211
+  thicknessMode:
+    m_OverrideState: 1
+    m_Value: 1
+  thickness:
+    m_OverrideState: 1
+    m_Value: 0.25
+  quality:
+    m_OverrideState: 1
+    m_Value: 2
+  maxStep:
+    m_OverrideState: 1
+    m_Value: 57
+  accumFactor:
+    m_OverrideState: 1
+    m_Value: 0.75
+  resolution:
+    m_OverrideState: 0
+    m_Value: 4
+  mipmapsMode:
+    m_OverrideState: 0
+    m_Value: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -69,7 +162,8 @@ MonoBehaviour:
   - {fileID: 6021617316971038843}
   - {fileID: 2254744145489006594}
   - {fileID: 3988037984815077074}
-  - {fileID: 2508213857842368521}
+  - {fileID: 2707684693543764708}
+  - {fileID: -149540311801507145}
 --- !u!114 &849379129802519247
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -82,7 +176,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97c23e3b12dc18c42a140437e53d3951, type: 3}
   m_Name: Tonemapping
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   mode:
     m_OverrideState: 1
     m_Value: 2
@@ -232,6 +326,25 @@ MonoBehaviour:
   accumFactor:
     m_OverrideState: 0
     m_Value: 0.75
+--- !u!114 &2707684693543764708
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24ef8b6238804c56ad23cf249538048b, type: 3}
+  m_Name: VolumetricLightVolume
+  m_EditorClassIdentifier: 
+  active: 0
+  intensity:
+    m_OverrideState: 1
+    m_Value: 0.201
+  sampleCount:
+    m_OverrideState: 1
+    m_Value: 50
 --- !u!114 &3147227526466114598
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -313,7 +426,7 @@ MonoBehaviour:
   active: 0
   Intensity:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0.503
   HdrMax:
     m_OverrideState: 1
     m_Value: 256
@@ -322,7 +435,7 @@ MonoBehaviour:
     m_Value: 0
   Exposure:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 1
   LPMExposure:
     m_OverrideState: 1
     m_Value: 8
@@ -334,13 +447,13 @@ MonoBehaviour:
     m_Value: 1
   Saturation:
     m_OverrideState: 1
-    m_Value: {x: 0, y: 0, z: 0}
+    m_Value: {x: 0.24, y: 0, z: 0}
   Crosstalk:
     m_OverrideState: 1
-    m_Value: {x: 1, y: 0.5, z: 0.03125}
+    m_Value: {x: 1.18, y: 0.88, z: 0.03125}
   displayMode:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 1
 --- !u!114 &7555827183838488180
 MonoBehaviour:
   m_ObjectHideFlags: 3

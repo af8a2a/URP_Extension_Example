@@ -1,0 +1,4 @@
+[submodule "Packages/Custom_URP"]
+	path = Packages/Custom_URP
+	url = https://github.com/af8a2a/Custom_URP
+	branch = URP17

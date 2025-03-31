@@ -26,7 +26,7 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing
             profilingSampler = new ProfilingSampler(nameof(ForwardGBufferPass));
             RenderQueueRange queue = RenderQueueRange.opaque;
             m_filter = new FilteringSettings(queue);
-
+            renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
             if (PassNames != null && PassNames.Length > 0)
             {
                 foreach (var passName in PassNames)

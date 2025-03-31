@@ -13,8 +13,6 @@ MonoBehaviour:
   m_Name: GrabScreenBlurRendererFeature
   m_EditorClassIdentifier: 
   m_Active: 1
-  config:
-    blurMaterial: {fileID: 2100000, guid: 670fb847d3693b44482de7e8292dcb3f, type: 2}
 --- !u!114 &-8046564352974730807
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -42,6 +40,20 @@ MonoBehaviour:
   m_Script: {fileID: 0}
   m_Name: CACAOFeature
   m_EditorClassIdentifier: 
+--- !u!114 &-7267285831880783935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed925c60396c4dfe928d6e623b0fd179, type: 3}
+  m_Name: DiffusionFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  renderPassEvent: 600
 --- !u!114 &-6176375078578449151
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -87,11 +99,11 @@ MonoBehaviour:
   m_Settings:
     Downsample: 1
     AfterOpaque: 0
-    Source: 1
-    NormalSamples: 2
-    Intensity: 0.97
-    DirectLightingStrength: 0.741
-    Radius: 0.41
+    Source: 0
+    NormalSamples: 1
+    Intensity: 2.34
+    DirectLightingStrength: 0.437
+    Radius: 0.34
     SampleCount: 20
 --- !u!114 &-3686001903448193319
 MonoBehaviour:
@@ -105,7 +117,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 249f676b65f918e43b6223deea9ed0ef, type: 3}
   m_Name: FlimRenderPassFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
 --- !u!114 &-3490403499653477285
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -125,6 +137,19 @@ MonoBehaviour:
     intensity: 0.7
     stepTimes: 16
     blurRange: 1
+--- !u!114 &-3086511105373398166
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f3f560528c64a82bdfbba7b90c2d1bc, type: 3}
+  m_Name: ScreenSpaceReflectionFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
 --- !u!114 &-2902112244124871261
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -137,8 +162,56 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e32e72b6a3f58a24c9033e2b9275eea0, type: 3}
   m_Name: ScreenSpaceShadows
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   m_Shader: {fileID: 4800000, guid: 0f854b35a0cf61a429bd5dcfea30eddd, type: 3}
+--- !u!114 &-1813445979578815844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f12908ece53740d0b1afba30ca695a18, type: 3}
+  m_Name: GSR2Feature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &-1427989437531245132
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f62c9c65cf3354c93be831c8bc075510, type: 3}
+  m_Name: ScreenSpaceAmbientOcclusion
+  m_EditorClassIdentifier: 
+  m_Active: 0
+  m_Settings:
+    AOMethod: 1
+    Downsample: 0
+    AfterOpaque: 0
+    Source: 1
+    NormalSamples: 1
+    Intensity: 1.2
+    DirectLightingStrength: 0.142
+    Radius: 1.93
+    Samples: 0
+    BlurQuality: 0
+    Falloff: 100
+    SampleCount: -1
+  m_BlueNoise256Textures:
+  - {fileID: 2800000, guid: 36f118343fc974119bee3d09e2111500, type: 3}
+  - {fileID: 2800000, guid: 4b7b083e6b6734e8bb2838b0b50a0bc8, type: 3}
+  - {fileID: 2800000, guid: c06cc21c692f94f5fb5206247191eeee, type: 3}
+  - {fileID: 2800000, guid: cb76dd40fa7654f9587f6a344f125c9a, type: 3}
+  - {fileID: 2800000, guid: e32226222ff144b24bf3a5a451de54bc, type: 3}
+  - {fileID: 2800000, guid: 3302065f671a8450b82c9ddf07426f3a, type: 3}
+  - {fileID: 2800000, guid: 56a77a3e8d64f47b6afe9e3c95cb57d5, type: 3}
+  m_Shader: {fileID: 4800000, guid: 0849e84e3d62649e8882e9d6f056a017, type: 3}
 --- !u!114 &-766027341213290787
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -179,18 +252,19 @@ MonoBehaviour:
     probeSamplingDebugTexture: {fileID: 0}
     probeVolumeBlendStatesCS: {fileID: 0}
   m_RendererFeatures:
-  - {fileID: 4546765418592760336}
   - {fileID: -6176375078578449151}
   - {fileID: -9002618474160471110}
-  - {fileID: 8508543744943413698}
   - {fileID: -2902112244124871261}
   - {fileID: 8954296569333617161}
   - {fileID: -3686001903448193319}
   - {fileID: 5183089323404221537}
   - {fileID: 3461166638362642092}
   - {fileID: -5323435224801480069}
-  - {fileID: 8757769475160929191}
-  m_RendererFeatureMap: 107240f40e5b193f0195c101971b49aabac34b1732461083c25939b1746b1476a315a03e4aa0b9d70912a1b4490d447cd9868e4fccb0d8cc61dca0484708ee47acc60934b88808307bf2e728de5b1fb6a7f3b9dfefd88979
+  - {fileID: -1427989437531245132}
+  - {fileID: -7267285831880783935}
+  - {fileID: -1813445979578815844}
+  - {fileID: -3086511105373398166}
+  m_RendererFeatureMap: 0195c101971b49aabac34b1732461083a315a03e4aa0b9d70912a1b4490d447cd9868e4fccb0d8cc61dca0484708ee47acc60934b88808307bf2e728de5b1fb6b4b5f0202cc32eecc14784250a6a259b9c2ad8577d58d5e66a9bebb080822ad5
   m_UseNativeRenderPass: 0
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -247,9 +321,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e97072c0e2148ebadb06fe0c0adae7d, type: 3}
   m_Name: ScratchFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
-  ScratchMaterial: {fileID: 2100000, guid: b77f081343d729d4099091dc0f250fe8, type: 2}
---- !u!114 &4546765418592760336
+  m_Active: 0
+--- !u!114 &5181395248709815091
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -258,13 +331,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ed925c60396c4dfe928d6e623b0fd179, type: 3}
-  m_Name: DiffusionFeature
+  m_Script: {fileID: 11500000, guid: c97064a2b224fc648bd70e33fd9339c7, type: 3}
+  m_Name: NewPostProcessEffectRendererFeature
   m_EditorClassIdentifier: 
   m_Active: 0
-  DiffusionMaterial: {fileID: 2100000, guid: 7cba9c40a7ea2c746bb8a79e3371649b, type: 2}
-  renderPassEvent: 600
-  Intensity: 0.368
+  m_Material: {fileID: 2100000, guid: 78a08787ca30045abb69f6f7dd878e09, type: 2}
 --- !u!114 &5183089323404221537
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -277,7 +348,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ca32dec4987d644084938568cf1ef48, type: 3}
   m_Name: OcclusionOutlineFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
 --- !u!114 &6376237105138815149
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -318,9 +389,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f12908ece53740d0b1afba30ca695a18, type: 3}
   m_Name: GSR2Feature
   m_EditorClassIdentifier: 
-  m_Active: 0
-  upscaledRatio: 1.5
-  minLerpContribution: 0.715
+  m_Active: 1
 --- !u!114 &8954296569333617161
 MonoBehaviour:
   m_ObjectHideFlags: 0
