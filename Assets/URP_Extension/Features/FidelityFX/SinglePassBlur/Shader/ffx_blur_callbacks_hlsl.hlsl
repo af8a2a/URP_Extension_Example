@@ -25,7 +25,7 @@
 #if defined(FFX_GPU)
 
 
-#include "ffx_core.hlsl"
+#include "../../Core/ffx_core.hlsl"
 
 #ifdef __hlsl_dx_compiler
 #pragma dxc diagnostic pop

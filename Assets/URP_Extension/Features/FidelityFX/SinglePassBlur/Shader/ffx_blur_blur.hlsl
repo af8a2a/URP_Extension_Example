@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include "ffx_core.hlsl"
+#include "../../Core/ffx_core.hlsl"
 
 FFX_BLUR_KERNEL_TYPE BlurLoadKernelWeight(FfxInt32 iKernelIndex)
 {
