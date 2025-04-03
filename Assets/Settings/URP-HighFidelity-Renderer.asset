@@ -176,7 +176,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f12908ece53740d0b1afba30ca695a18, type: 3}
   m_Name: GSR2Feature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
 --- !u!114 &-1427989437531245132
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -225,6 +225,20 @@ MonoBehaviour:
   m_Name: PerObjectShadowFeature
   m_EditorClassIdentifier: 
   m_Active: 0
+--- !u!114 &-90286450009831450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ee7be4fa29e460ab3cc5510ea25722e, type: 3}
+  m_Name: DummyFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  cs: {fileID: 7200000, guid: aa703a3ecc14420491b35d83f6881f06, type: 3}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -264,7 +278,9 @@ MonoBehaviour:
   - {fileID: -7267285831880783935}
   - {fileID: -1813445979578815844}
   - {fileID: -3086511105373398166}
-  m_RendererFeatureMap: 0195c101971b49aabac34b1732461083a315a03e4aa0b9d70912a1b4490d447cd9868e4fccb0d8cc61dca0484708ee47acc60934b88808307bf2e728de5b1fb6b4b5f0202cc32eecc14784250a6a259b9c2ad8577d58d5e66a9bebb080822ad5
+  - {fileID: -90286450009831450}
+  - {fileID: 3892018970804695259}
+  m_RendererFeatureMap: 0195c101971b49aabac34b1732461083a315a03e4aa0b9d70912a1b4490d447cd9868e4fccb0d8cc61dca0484708ee47acc60934b88808307bf2e728de5b1fb6b4b5f0202cc32eecc14784250a6a259b9c2ad8577d58d5e66a9bebb080822ad5e60722bbf33cbffedb30e515a23a0336
   m_UseNativeRenderPass: 0
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -322,6 +338,20 @@ MonoBehaviour:
   m_Name: ScratchFeature
   m_EditorClassIdentifier: 
   m_Active: 0
+--- !u!114 &3892018970804695259
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: febcb3ead18d97042a101999937ced2f, type: 3}
+  m_Name: ComputeRendererFeature
+  m_EditorClassIdentifier: 
+  m_Active: 0
+  computeShader: {fileID: 7200000, guid: e0a62cf8f93b4da439ba6c1df01269a4, type: 3}
 --- !u!114 &5181395248709815091
 MonoBehaviour:
   m_ObjectHideFlags: 0

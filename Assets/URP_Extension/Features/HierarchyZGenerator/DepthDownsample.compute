@@ -1,0 +1,28 @@
+#pragma kernel HizMain
+
+Texture2D<float> DepthTexture;
+RWTexture2D<float> DepthTextureOutput;
+
+[numthreads(8, 8, 1)]
+void HizMain(uint3 tid : SV_DispatchThreadID)
+{
+    uint2 baseCoord = 2 * tid;
+
+
+    float depth00 = DepthTexture.Load(int3(baseCoord + uint2(0, 0), 0));
+    float depth01 = DepthTexture.Load(int3(baseCoord + uint2(0, 1), 0));
+    float depth10 = DepthTexture.Load(int3(baseCoord + uint2(1, 0), 0));
+    float depth11 = DepthTexture.Load(int3(baseCoord + uint2(1, 1), 0));
+
+    // #ifdef UNITY_REVERSED_Z
+    float minDepth = min(depth00, depth01);
+    minDepth = min(minDepth, min(depth10, minDepth));
+    minDepth = min(minDepth, min(depth11, minDepth));
+    // #else
+    // float minDepth = max(depth00, depth01);
+    // minDepth = max(minDepth, max(depth10, minDepth));
+    // minDepth = max(minDepth, max(depth11, minDepth));
+    // #endif
+
+    DepthTextureOutput[tid.xy] = minDepth;
+}
