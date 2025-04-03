@@ -4,6 +4,8 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.RenderGraphModule.Util;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.Serialization;
+using URP_Extension.Features.Glass;
 using RenderGraphUtils = UnityEngine.Rendering.RenderGraphModule.Util.RenderGraphUtils;
 
 public class GrabScreenBlurRendererFeature : ScriptableRendererFeature
@@ -45,25 +47,29 @@ public class GrabScreenBlurRendererFeature : ScriptableRendererFeature
 
         public GrabScreenBlurPass()
         {
-            
             blurMat = new Material(Shader.Find("FullScreenBlur"));
             profilingSampler = new ProfilingSampler(nameof(GrabScreenBlurPass));
         }
 
         private class PassData
         {
+            internal TextureHandle cameraTexture;
+            internal TextureHandle blurHorizonRT;
+            internal TextureHandle blurVerticalRT;
+            internal Material blurMat;
+            internal int blurAmount;
         }
 
         public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
-            var resourceData = frameData.Get<UniversalResourceData>();
-            var cameraData = frameData.Get<UniversalCameraData>();
             var volume = VolumeManager.instance.stack.GetComponent<GrabScreenBlur>();
-
             if (volume == null || !volume.IsActive())
             {
                 return;
             }
+
+            var resourceData = frameData.Get<UniversalResourceData>();
+            var cameraData = frameData.Get<UniversalCameraData>();
 
             var source = resourceData.activeColorTexture;
             var destinationDesc = renderGraph.GetTextureDesc(source);
@@ -77,38 +83,45 @@ public class GrabScreenBlurRendererFeature : ScriptableRendererFeature
             // var blurHorizonRT = UniversalRenderer.CreateRenderGraphTexture(renderGraph, desc, "blurHorizonRT", false);
             // var blurVerticalRT = UniversalRenderer.CreateRenderGraphTexture(renderGraph, desc, "BlurVerticalRT", false);
 
-            renderGraph.AddCopyPass(resourceData.activeColorTexture, blurHorizonRT);
-            RenderGraphUtils.BlitMaterialParameters blitH =
-                new RenderGraphUtils.BlitMaterialParameters(blurHorizonRT, blurVerticalRT, BlurMat, 0);
-            RenderGraphUtils.BlitMaterialParameters blitV =
-                new RenderGraphUtils.BlitMaterialParameters(blurVerticalRT, blurHorizonRT, BlurMat, 1);
-            for (int i = 0; i < volume.blurAmount.value; i++)
-            {
-                renderGraph.AddBlitPass(blitH);
-                renderGraph.AddBlitPass(blitV);
-            }
+            // RenderGraphUtils.BlitMaterialParameters blitH =
+            //     new RenderGraphUtils.BlitMaterialParameters(blurHorizonRT, blurVerticalRT, BlurMat, 0);
+            // RenderGraphUtils.BlitMaterialParameters blitV =
+            //     new RenderGraphUtils.BlitMaterialParameters(blurVerticalRT, blurHorizonRT, BlurMat, 1);
+            // for (int i = 0; i < volume.blurAmount.value; i++)
+            // {
+            //     renderGraph.AddBlitPass(blitH);
+            //     renderGraph.AddBlitPass(blitV);
+            // }
 
-            using (var builder = renderGraph.AddRasterRenderPass<PassData>("GrabBlur", out var passData))
+            using (var builder = renderGraph.AddUnsafePass<PassData>("GrabBlur", out var passData))
             {
-                
                 builder.AllowPassCulling(false);
+                passData.blurHorizonRT = blurHorizonRT;
+                passData.blurVerticalRT = blurVerticalRT;
+                passData.cameraTexture = resourceData.activeColorTexture;
+                passData.blurMat = blurMat;
+                passData.blurAmount = volume.blurAmount.value;
+
+                builder.UseTexture(passData.cameraTexture);
+                builder.UseTexture(passData.blurHorizonRT, AccessFlags.ReadWrite);
+                builder.UseTexture(passData.blurVerticalRT, AccessFlags.ReadWrite);
                 builder.SetGlobalTextureAfterPass(blurHorizonRT,
                     Shader.PropertyToID("_BlurTexture"));
 
-                builder.SetRenderFunc((PassData data, RasterGraphContext context) => { });
+                builder.SetRenderFunc((PassData data, UnsafeGraphContext context) =>
+                {
+                    var cmd = CommandBufferHelpers.GetNativeCommandBuffer(context.cmd);
+                    Blitter.BlitCameraTexture(cmd, data.cameraTexture, data.blurVerticalRT, blurMat, 0);
+
+                    Blitter.BlitCameraTexture(cmd, data.blurVerticalRT, data.blurHorizonRT, blurMat, 1);
+
+                    for (int i = 0; i < data.blurAmount - 1; i++)
+                    {
+                        Blitter.BlitCameraTexture(cmd, data.blurHorizonRT, data.blurVerticalRT, blurMat, 0);
+                        Blitter.BlitCameraTexture(cmd, data.blurVerticalRT, data.blurHorizonRT, blurMat, 1);
+                    }
+                });
             }
         }
     }
-}
-
-[System.Serializable]
-public class GrabScreenBlur : VolumeComponent, IPostProcessComponent
-{
-    public ClampedIntParameter blurAmount = new ClampedIntParameter(0, 0, 4);
-    public ClampedFloatParameter blurIntensity = new ClampedFloatParameter(0f, 0f, 1f);
-    public BoolParameter enabled = new BoolParameter(false);
-
-    public bool IsActive() => enabled.value;
-
-    public bool IsTileCompatible() => false;
 }

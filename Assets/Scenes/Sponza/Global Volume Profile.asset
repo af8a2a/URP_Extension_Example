@@ -13,15 +13,19 @@ MonoBehaviour:
   m_Name: GrabScreenBlur
   m_EditorClassIdentifier: URP_Extension::GrabScreenBlur
   active: 1
+  <displayName>k__BackingField: 
   blurAmount:
-    m_OverrideState: 0
-    m_Value: 0
+    <debugId>k__BackingField: blurAmount
+    m_OverrideState: 1
+    m_Value: 3
   blurIntensity:
-    m_OverrideState: 0
-    m_Value: 0
+    <debugId>k__BackingField: blurIntensity
+    m_OverrideState: 1
+    m_Value: 1
   enabled:
-    m_OverrideState: 0
-    m_Value: 0
+    <debugId>k__BackingField: enabled
+    m_OverrideState: 1
+    m_Value: 1
 --- !u!114 &-7379238737743196520
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -188,6 +192,28 @@ MonoBehaviour:
   Intensity:
     m_OverrideState: 1
     m_Value: 1
+--- !u!114 &-2259969205498530629
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16788ce2c8054278b762b24ae61f6f7f, type: 3}
+  m_Name: GrabScreenBlur
+  m_EditorClassIdentifier: 
+  active: 1
+  blurAmount:
+    m_OverrideState: 1
+    m_Value: 0
+  blurIntensity:
+    m_OverrideState: 1
+    m_Value: 0
+  enabled:
+    m_OverrideState: 1
+    m_Value: 1
 --- !u!114 &-621012647693341367
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -252,7 +278,7 @@ MonoBehaviour:
   - {fileID: -3972751328780206285}
   - {fileID: -394219664679543303}
   - {fileID: -4330277696161760110}
-  - {fileID: -7922501826052019638}
+  - {fileID: -2259969205498530629}
 --- !u!114 &422740205753480726
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -292,13 +318,17 @@ MonoBehaviour:
   m_Name: GrabScreenBlur
   m_EditorClassIdentifier: URP_Extension::GrabScreenBlur
   active: 1
+  <displayName>k__BackingField: 
   blurAmount:
+    <debugId>k__BackingField: blurAmount
     m_OverrideState: 1
     m_Value: 3
   blurIntensity:
+    <debugId>k__BackingField: blurIntensity
     m_OverrideState: 1
     m_Value: 0.304
   enabled:
+    <debugId>k__BackingField: enabled
     m_OverrideState: 1
     m_Value: 1
 --- !u!114 &3983410969659473220
@@ -363,6 +393,32 @@ MonoBehaviour:
   enabled:
     m_OverrideState: 1
     m_Value: 1
+--- !u!114 &4560522841081457843
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: GrabScreenBlur
+  m_EditorClassIdentifier: URP_Extension::GrabScreenBlur
+  active: 1
+  <displayName>k__BackingField: 
+  blurAmount:
+    <debugId>k__BackingField: blurAmount
+    m_OverrideState: 0
+    m_Value: 0
+  blurIntensity:
+    <debugId>k__BackingField: blurIntensity
+    m_OverrideState: 0
+    m_Value: 0
+  enabled:
+    <debugId>k__BackingField: enabled
+    m_OverrideState: 0
+    m_Value: 0
 --- !u!114 &5095632333089955248
 MonoBehaviour:
   m_ObjectHideFlags: 3
