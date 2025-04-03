@@ -21,24 +21,33 @@ namespace URP_Extension.Features.SinglePassBlur
 
         internal class PassData
         {
-            internal ComputeShader computeShader;
-            internal int kernelID;
-            internal Vector2 imageSize;
+            internal ComputeShader ComputeShader;
+            internal int KernelID;
+            internal Vector2 ImageSize;
             internal Vector2 BlurTileSize;
-            internal TextureHandle inputTexture;
-            internal TextureHandle outputTexture;
+            internal bool Fp16Packed = false;
+            internal bool WaveFrontOperation = false;
+            internal TextureHandle InputTexture;
+            internal TextureHandle OutputTexture;
         }
 
-        
+
         static void ExecutePass(PassData passData, ComputeGraphContext computeGraphContext)
         {
             var cmd = computeGraphContext.cmd;
-            cmd.SetComputeVectorParam(passData.computeShader, "imageSize", passData.imageSize);
 
-            cmd.SetComputeTextureParam(passData.computeShader, passData.kernelID, "r_input_src", passData.inputTexture);
-            cmd.SetComputeTextureParam(passData.computeShader, passData.kernelID, "rw_output", passData.outputTexture);
-            cmd.DispatchCompute(passData.computeShader, passData.kernelID,
-                (int)(passData.imageSize.x / passData.BlurTileSize.x), (int)(passData.imageSize.y /
+
+            cmd.SetKeyword(passData.ComputeShader, new LocalKeyword(passData.ComputeShader, "FFX_WAVE"),
+                passData.WaveFrontOperation);
+            cmd.SetKeyword(passData.ComputeShader, new LocalKeyword(passData.ComputeShader, "FFX_HALF"),
+                passData.Fp16Packed);
+
+            cmd.SetComputeVectorParam(passData.ComputeShader, "imageSize", passData.ImageSize);
+
+            cmd.SetComputeTextureParam(passData.ComputeShader, passData.KernelID, "r_input_src", passData.InputTexture);
+            cmd.SetComputeTextureParam(passData.ComputeShader, passData.KernelID, "rw_output", passData.OutputTexture);
+            cmd.DispatchCompute(passData.ComputeShader, passData.KernelID,
+                (int)(passData.ImageSize.x / passData.BlurTileSize.x), (int)(passData.ImageSize.y /
                                                                              passData.BlurTileSize.y),
                 1);
         }
@@ -51,17 +60,25 @@ namespace URP_Extension.Features.SinglePassBlur
             desc.enableRandomWrite = true;
             desc.name = "SinglePassBlur";
             var output = renderGraph.CreateTexture(desc);
+
+            var setting = VolumeManager.instance.stack.GetComponent<SinglePassBlurSetting>();
             using (var builder = renderGraph.AddComputePass<PassData>("SinglePassBlurPass", out var passData))
             {
-                passData.inputTexture = resourceData.activeColorTexture;
-                passData.outputTexture = output;
+                builder.AllowGlobalStateModification(true);
+                passData.InputTexture = resourceData.activeColorTexture;
+                passData.OutputTexture = output;
                 passData.BlurTileSize = new Vector2(_ffxBlurTileSizeX, _ffxBlurTileSizeY);
-                passData.imageSize = new Vector2(desc.width, desc.height);
-                passData.computeShader = _computeShader;
-                passData.kernelID = kernelID;
+                passData.ImageSize = new Vector2(desc.width, desc.height);
+                passData.ComputeShader = _computeShader;
+                passData.KernelID = kernelID;
+                if (setting != null)
+                {
+                    passData.Fp16Packed = setting.fp16Packed.value;
+                    passData.WaveFrontOperation = setting.wavefrontOperation.value;
+                }
 
-                builder.UseTexture(passData.inputTexture, AccessFlags.ReadWrite);
-                builder.UseTexture(passData.outputTexture, AccessFlags.ReadWrite);
+                builder.UseTexture(passData.InputTexture, AccessFlags.ReadWrite);
+                builder.UseTexture(passData.OutputTexture, AccessFlags.ReadWrite);
 
                 builder.SetRenderFunc((PassData data, ComputeGraphContext cgContext) => ExecutePass(data, cgContext));
             }

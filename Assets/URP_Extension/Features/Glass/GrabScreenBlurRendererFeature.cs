@@ -45,6 +45,7 @@ public class GrabScreenBlurRendererFeature : ScriptableRendererFeature
 
         public GrabScreenBlurPass()
         {
+            
             blurMat = new Material(Shader.Find("FullScreenBlur"));
             profilingSampler = new ProfilingSampler(nameof(GrabScreenBlurPass));
         }
@@ -89,6 +90,7 @@ public class GrabScreenBlurRendererFeature : ScriptableRendererFeature
 
             using (var builder = renderGraph.AddRasterRenderPass<PassData>("GrabBlur", out var passData))
             {
+                
                 builder.AllowPassCulling(false);
                 builder.SetGlobalTextureAfterPass(blurHorizonRT,
                     Shader.PropertyToID("_BlurTexture"));

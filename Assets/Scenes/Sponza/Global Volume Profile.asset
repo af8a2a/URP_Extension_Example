@@ -1,5 +1,27 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-7922501826052019638
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: GrabScreenBlur
+  m_EditorClassIdentifier: URP_Extension::GrabScreenBlur
+  active: 1
+  blurAmount:
+    m_OverrideState: 0
+    m_Value: 0
+  blurIntensity:
+    m_OverrideState: 0
+    m_Value: 0
+  enabled:
+    m_OverrideState: 0
+    m_Value: 0
 --- !u!114 &-7379238737743196520
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -109,6 +131,28 @@ MonoBehaviour:
   feedback:
     m_OverrideState: 0
     m_Value: 0
+--- !u!114 &-4330277696161760110
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3882a3ea188e4f89b05c417442bf949a, type: 3}
+  m_Name: SinglePassBlurSetting
+  m_EditorClassIdentifier: 
+  active: 1
+  enabled:
+    m_OverrideState: 1
+    m_Value: 1
+  wavefrontOperation:
+    m_OverrideState: 1
+    m_Value: 1
+  fp16Packed:
+    m_OverrideState: 1
+    m_Value: 1
 --- !u!114 &-3972751328780206285
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -207,7 +251,8 @@ MonoBehaviour:
   - {fileID: -3362228198130784316}
   - {fileID: -3972751328780206285}
   - {fileID: -394219664679543303}
-  - {fileID: 2694285367520836164}
+  - {fileID: -4330277696161760110}
+  - {fileID: -7922501826052019638}
 --- !u!114 &422740205753480726
 MonoBehaviour:
   m_ObjectHideFlags: 3

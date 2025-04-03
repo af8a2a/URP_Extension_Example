@@ -31,6 +31,9 @@
 #define FFX_HLSL 1
 #define FFX_GPU 1
 
+#pragma multi_compile _ FFX_WAVE
+#pragma multi_compile _ FFX_HALF
+
 #define FFX_BLUR_BIND_SRV_INPUT_SRC 0
 #define FFX_BLUR_BIND_UAV_OUTPUT    0
 #define FFX_BLUR_BIND_CB_BLUR 0

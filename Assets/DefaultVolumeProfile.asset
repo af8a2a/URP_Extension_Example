@@ -196,6 +196,28 @@ MonoBehaviour:
   saturation:
     m_OverrideState: 1
     m_Value: 0
+--- !u!114 &-6851418307679589726
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3882a3ea188e4f89b05c417442bf949a, type: 3}
+  m_Name: SinglePassBlurSetting
+  m_EditorClassIdentifier: 
+  active: 1
+  enabled:
+    m_OverrideState: 1
+    m_Value: 0
+  wavefrontOperation:
+    m_OverrideState: 1
+    m_Value: 0
+  fp16Packed:
+    m_OverrideState: 1
+    m_Value: 0
 --- !u!114 &-6818190422185360871
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -257,6 +279,28 @@ MonoBehaviour:
     m_Value: 0
   enabled:
     m_OverrideState: 0
+    m_Value: 0
+--- !u!114 &-6397830751049183194
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: GrabScreenBlur
+  m_EditorClassIdentifier: URP_Extension::GrabScreenBlur
+  active: 1
+  blurAmount:
+    m_OverrideState: 1
+    m_Value: 0
+  blurIntensity:
+    m_OverrideState: 1
+    m_Value: 0
+  enabled:
+    m_OverrideState: 1
     m_Value: 0
 --- !u!114 &-5966735856823547759
 MonoBehaviour:
@@ -1056,7 +1100,8 @@ MonoBehaviour:
   - {fileID: -5300660119483438764}
   - {fileID: 3286312086682456770}
   - {fileID: 6212784953965881621}
-  - {fileID: -5170364389069214421}
+  - {fileID: -6851418307679589726}
+  - {fileID: -6397830751049183194}
 --- !u!114 &19268007692184746
 MonoBehaviour:
   m_ObjectHideFlags: 3
