@@ -108,7 +108,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00b5265c810b432fa2bd33642d3e9cde, type: 3}
   m_Name: ScreenSpaceReflection
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   state:
     m_OverrideState: 1
     m_Value: 1
@@ -164,6 +164,7 @@ MonoBehaviour:
   - {fileID: 3988037984815077074}
   - {fileID: 2707684693543764708}
   - {fileID: -149540311801507145}
+  - {fileID: 8283926697528027518}
 --- !u!114 &849379129802519247
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -376,7 +377,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b2db86121404754db890f4c8dfe81b2, type: 3}
   m_Name: Bloom
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   skipIterations:
     m_OverrideState: 1
     m_Value: 1
@@ -423,35 +424,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33eac5601302433faab1e2923ca852ff, type: 3}
   m_Name: LPMVolume
   m_EditorClassIdentifier: 
-  active: 0
-  Intensity:
+  active: 1
+  shoulder:
     m_OverrideState: 1
-    m_Value: 0.503
+    m_Value: 1
   HdrMax:
     m_OverrideState: 1
     m_Value: 256
   SoftGap:
     m_OverrideState: 1
-    m_Value: 0
-  Exposure:
-    m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0.629
   LPMExposure:
     m_OverrideState: 1
-    m_Value: 8
+    m_Value: 7.66
   Contrast:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0.465
   ShoulderContrast:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 1.0796
   Saturation:
     m_OverrideState: 1
-    m_Value: {x: 0.24, y: 0, z: 0}
+    m_Value: {x: 0.53, y: 1, z: 1}
   Crosstalk:
     m_OverrideState: 1
-    m_Value: {x: 1.18, y: 0.88, z: 0.03125}
+    m_Value: {x: 1, y: 0.48, z: 0.03125}
   displayMode:
+    m_OverrideState: 1
+    m_Value: 0
+  colorSpace:
+    m_OverrideState: 1
+    m_Value: 3
+  computeShaderMode:
+    m_OverrideState: 1
+    m_Value: 1
+  enabled:
     m_OverrideState: 1
     m_Value: 1
 --- !u!114 &7555827183838488180
@@ -474,3 +481,25 @@ MonoBehaviour:
   intensity:
     m_OverrideState: 0
     m_Value: 0
+--- !u!114 &8283926697528027518
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e326f41282331b4384ddf9dbd936bb6, type: 3}
+  m_Name: SinglePassBlurSetting
+  m_EditorClassIdentifier: 
+  active: 0
+  enabled:
+    m_OverrideState: 1
+    m_Value: 1
+  wavefrontOperation:
+    m_OverrideState: 1
+    m_Value: 1
+  fp16Packed:
+    m_OverrideState: 1
+    m_Value: 1

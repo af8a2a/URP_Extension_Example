@@ -1,5 +1,31 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-7922501826052019638
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: GrabScreenBlur
+  m_EditorClassIdentifier: URP_Extension::GrabScreenBlur
+  active: 1
+  <displayName>k__BackingField: 
+  blurAmount:
+    <debugId>k__BackingField: blurAmount
+    m_OverrideState: 1
+    m_Value: 3
+  blurIntensity:
+    <debugId>k__BackingField: blurIntensity
+    m_OverrideState: 1
+    m_Value: 1
+  enabled:
+    <debugId>k__BackingField: enabled
+    m_OverrideState: 1
+    m_Value: 1
 --- !u!114 &-7379238737743196520
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -109,6 +135,32 @@ MonoBehaviour:
   feedback:
     m_OverrideState: 0
     m_Value: 0
+--- !u!114 &-4330277696161760110
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3882a3ea188e4f89b05c417442bf949a, type: 3}
+  m_Name: SinglePassBlurSetting
+  m_EditorClassIdentifier: 
+  active: 1
+  <displayName>k__BackingField: 
+  enabled:
+    <debugId>k__BackingField: enabled
+    m_OverrideState: 1
+    m_Value: 1
+  wavefrontOperation:
+    <debugId>k__BackingField: wavefrontOperation
+    m_OverrideState: 1
+    m_Value: 1
+  fp16Packed:
+    <debugId>k__BackingField: fp16Packed
+    m_OverrideState: 1
+    m_Value: 0
 --- !u!114 &-3972751328780206285
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -142,6 +194,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   active: 0
   Intensity:
+    m_OverrideState: 1
+    m_Value: 1
+--- !u!114 &-2259969205498530629
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16788ce2c8054278b762b24ae61f6f7f, type: 3}
+  m_Name: GrabScreenBlur
+  m_EditorClassIdentifier: 
+  active: 0
+  blurAmount:
+    m_OverrideState: 1
+    m_Value: 1
+  blurIntensity:
+    m_OverrideState: 1
+    m_Value: 1
+  enabled:
     m_OverrideState: 1
     m_Value: 1
 --- !u!114 &-621012647693341367
@@ -188,6 +262,28 @@ MonoBehaviour:
   enabled:
     m_OverrideState: 1
     m_Value: 1
+--- !u!114 &-353639211571512006
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e326f41282331b4384ddf9dbd936bb6, type: 3}
+  m_Name: SinglePassBlurSetting
+  m_EditorClassIdentifier: 
+  active: 0
+  enabled:
+    m_OverrideState: 1
+    m_Value: 1
+  wavefrontOperation:
+    m_OverrideState: 1
+    m_Value: 1
+  fp16Packed:
+    m_OverrideState: 1
+    m_Value: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -207,7 +303,9 @@ MonoBehaviour:
   - {fileID: -3362228198130784316}
   - {fileID: -3972751328780206285}
   - {fileID: -394219664679543303}
-  - {fileID: 2694285367520836164}
+  - {fileID: -2259969205498530629}
+  - {fileID: 3423803413763770975}
+  - {fileID: -353639211571512006}
 --- !u!114 &422740205753480726
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -247,12 +345,65 @@ MonoBehaviour:
   m_Name: GrabScreenBlur
   m_EditorClassIdentifier: URP_Extension::GrabScreenBlur
   active: 1
+  <displayName>k__BackingField: 
   blurAmount:
+    <debugId>k__BackingField: blurAmount
     m_OverrideState: 1
     m_Value: 3
   blurIntensity:
+    <debugId>k__BackingField: blurIntensity
     m_OverrideState: 1
     m_Value: 0.304
+  enabled:
+    <debugId>k__BackingField: enabled
+    m_OverrideState: 1
+    m_Value: 1
+--- !u!114 &3423803413763770975
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33eac5601302433faab1e2923ca852ff, type: 3}
+  m_Name: LumaPreservingMapper
+  m_EditorClassIdentifier: 
+  active: 0
+  shoulder:
+    m_OverrideState: 1
+    m_Value: 0
+  HdrMax:
+    m_OverrideState: 1
+    m_Value: 256
+  SoftGap:
+    m_OverrideState: 1
+    m_Value: 0
+  LPMExposure:
+    m_OverrideState: 1
+    m_Value: 7.86
+  Contrast:
+    m_OverrideState: 1
+    m_Value: 1
+  ShoulderContrast:
+    m_OverrideState: 1
+    m_Value: 1
+  Saturation:
+    m_OverrideState: 1
+    m_Value: {x: 0, y: 0, z: 0}
+  Crosstalk:
+    m_OverrideState: 1
+    m_Value: {x: 1, y: 0.5, z: 0.03125}
+  displayMode:
+    m_OverrideState: 1
+    m_Value: 2
+  colorSpace:
+    m_OverrideState: 1
+    m_Value: 2
+  computeShaderMode:
+    m_OverrideState: 1
+    m_Value: 1
   enabled:
     m_OverrideState: 1
     m_Value: 1
@@ -318,6 +469,32 @@ MonoBehaviour:
   enabled:
     m_OverrideState: 1
     m_Value: 1
+--- !u!114 &4560522841081457843
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: GrabScreenBlur
+  m_EditorClassIdentifier: URP_Extension::GrabScreenBlur
+  active: 1
+  <displayName>k__BackingField: 
+  blurAmount:
+    <debugId>k__BackingField: blurAmount
+    m_OverrideState: 0
+    m_Value: 0
+  blurIntensity:
+    <debugId>k__BackingField: blurIntensity
+    m_OverrideState: 0
+    m_Value: 0
+  enabled:
+    <debugId>k__BackingField: enabled
+    m_OverrideState: 0
+    m_Value: 0
 --- !u!114 &5095632333089955248
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -331,16 +508,13 @@ MonoBehaviour:
   m_Name: LPMVolume
   m_EditorClassIdentifier: 
   active: 1
-  Intensity:
-    m_OverrideState: 1
-    m_Value: 1
+  shoulder:
+    m_OverrideState: 0
+    m_Value: 0
   HdrMax:
     m_OverrideState: 1
     m_Value: 256
   SoftGap:
-    m_OverrideState: 1
-    m_Value: 0
-  Exposure:
     m_OverrideState: 1
     m_Value: 0
   LPMExposure:
@@ -360,6 +534,15 @@ MonoBehaviour:
     m_Value: {x: 1, y: 0.5, z: 0.03125}
   displayMode:
     m_OverrideState: 1
+    m_Value: 0
+  colorSpace:
+    m_OverrideState: 0
+    m_Value: 0
+  computeShaderMode:
+    m_OverrideState: 0
+    m_Value: 1
+  enabled:
+    m_OverrideState: 0
     m_Value: 0
 --- !u!114 &6238202059926820811
 MonoBehaviour:
