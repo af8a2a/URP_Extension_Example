@@ -62,6 +62,10 @@ namespace URP_Extension.Features.SinglePassBlur
             var output = renderGraph.CreateTexture(desc);
 
             var setting = VolumeManager.instance.stack.GetComponent<SinglePassBlurSetting>();
+            if (setting == null || !setting.IsActive())
+            {
+                return;
+            }
             using (var builder = renderGraph.AddComputePass<PassData>("SinglePassBlurPass", out var passData))
             {
                 builder.AllowGlobalStateModification(true);
