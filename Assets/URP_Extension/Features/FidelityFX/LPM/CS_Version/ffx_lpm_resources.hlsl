@@ -20,48 +20,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-/// @defgroup FfxGPU GPU
-/// The FidelityFX SDK GPU References
-/// 
-/// @ingroup ffxSDK
+#ifndef FFX_LPM_RESOURCES_H
+#define FFX_LPM_RESOURCES_H
 
-/// @defgroup FfxHLSL HLSL References
-/// FidelityFX SDK HLSL GPU References
-/// 
-/// @ingroup FfxGPU
+#if defined(FFX_CPU) || defined(FFX_GPU)
+#define FFX_LPM_RESOURCE_IDENTIFIER_NULL                                          0
+#define FFX_LPM_RESOURCE_IDENTIFIER_INPUT_COLOR                                   1
+#define FFX_LPM_RESOURCE_IDENTIFIER_OUTPUT_COLOR                                  2
 
-/// @defgroup FfxGLSL GLSL References
-/// FidelityFX SDK GLSL GPU References
-/// 
-/// @ingroup FfxGPU
+#define FFX_LPM_RESOURCE_IDENTIFIER_COUNT                                         3
 
-/// @defgroup FfxGPUEffects FidelityFX GPU References
-/// FidelityFX Effect GPU Reference Documentation
-/// 
-/// @ingroup FfxGPU
+#define FFX_LPM_CONSTANTBUFFER_IDENTIFIER_LPM                                     0
 
-/// @defgroup GPUCore GPU Core
-/// GPU defines and functions
-/// 
-/// @ingroup FfxGPU
+#endif // #if defined(FFX_CPU) || defined(FFX_GPU)
 
-#if !defined(FFX_CORE_H)
-#define FFX_CORE_H
-
-
-#include "ffx_common_types.hlsl"
-
-
-
-#if defined(FFX_HLSL) && defined(FFX_GPU)
-    #include "ffx_core_hlsl.hlsl"
-#endif // #if defined(FFX_HLSL) && defined(FFX_GPU)
-
-#if defined(FFX_GPU)
-    #include "ffx_core_gpu_common.hlsl"
-    #include "ffx_core_gpu_common_half.hlsl"
-    #include "ffx_core_portability.hlsl"
-#endif // #if defined(FFX_GPU)
-
-
-#endif // #if !defined(FFX_CORE_H)
+#endif //!defined( FFX_LPM_RESOURCES_H )

@@ -108,7 +108,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00b5265c810b432fa2bd33642d3e9cde, type: 3}
   m_Name: ScreenSpaceReflection
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   state:
     m_OverrideState: 1
     m_Value: 1
@@ -423,13 +423,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33eac5601302433faab1e2923ca852ff, type: 3}
   m_Name: LPMVolume
   m_EditorClassIdentifier: 
-  active: 0
-  Intensity:
+  active: 1
+  shoulder:
     m_OverrideState: 1
-    m_Value: 0.503
+    m_Value: 1
   HdrMax:
     m_OverrideState: 1
-    m_Value: 256
+    m_Value: 345.64
   SoftGap:
     m_OverrideState: 1
     m_Value: 0
@@ -438,20 +438,29 @@ MonoBehaviour:
     m_Value: 1
   LPMExposure:
     m_OverrideState: 1
-    m_Value: 8
+    m_Value: 7.12
   Contrast:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0.3
   ShoulderContrast:
     m_OverrideState: 1
     m_Value: 1
   Saturation:
     m_OverrideState: 1
-    m_Value: {x: 0.24, y: 0, z: 0}
+    m_Value: {x: 0, y: 0, z: 0}
   Crosstalk:
     m_OverrideState: 1
-    m_Value: {x: 1.18, y: 0.88, z: 0.03125}
+    m_Value: {x: 1, y: 0.5, z: 0.03125}
   displayMode:
+    m_OverrideState: 1
+    m_Value: 2
+  colorSpace:
+    m_OverrideState: 1
+    m_Value: 1
+  computeShaderMode:
+    m_OverrideState: 1
+    m_Value: 1
+  enabled:
     m_OverrideState: 1
     m_Value: 1
 --- !u!114 &7555827183838488180

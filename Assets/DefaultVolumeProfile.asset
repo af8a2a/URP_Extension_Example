@@ -209,13 +209,17 @@ MonoBehaviour:
   m_Name: SinglePassBlurSetting
   m_EditorClassIdentifier: 
   active: 1
+  <displayName>k__BackingField: 
   enabled:
+    <debugId>k__BackingField: enabled
     m_OverrideState: 1
     m_Value: 0
   wavefrontOperation:
+    <debugId>k__BackingField: wavefrontOperation
     m_OverrideState: 1
     m_Value: 0
   fp16Packed:
+    <debugId>k__BackingField: fp16Packed
     m_OverrideState: 1
     m_Value: 0
 --- !u!114 &-6818190422185360871
@@ -1100,8 +1104,8 @@ MonoBehaviour:
   - {fileID: -5300660119483438764}
   - {fileID: 3286312086682456770}
   - {fileID: 6212784953965881621}
-  - {fileID: -6851418307679589726}
-  - {fileID: -6397830751049183194}
+  - {fileID: 6046568163861907648}
+  - {fileID: 1598001243899308306}
 --- !u!114 &19268007692184746
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -1235,6 +1239,28 @@ MonoBehaviour:
   accumFactor:
     m_OverrideState: 1
     m_Value: 0.75
+--- !u!114 &1598001243899308306
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16788ce2c8054278b762b24ae61f6f7f, type: 3}
+  m_Name: GrabScreenBlur
+  m_EditorClassIdentifier: 
+  active: 1
+  blurAmount:
+    m_OverrideState: 1
+    m_Value: 0
+  blurIntensity:
+    m_OverrideState: 1
+    m_Value: 0
+  enabled:
+    m_OverrideState: 1
+    m_Value: 0
 --- !u!114 &1710939912418265493
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -1261,8 +1287,8 @@ MonoBehaviour:
   m_Name: LPMVolume
   m_EditorClassIdentifier: 
   active: 1
-  Intensity:
-    m_OverrideState: 1
+  shoulder:
+    m_OverrideState: 0
     m_Value: 0
   HdrMax:
     m_OverrideState: 1
@@ -1290,6 +1316,15 @@ MonoBehaviour:
     m_Value: {x: 1, y: 0.5, z: 0.03125}
   displayMode:
     m_OverrideState: 1
+    m_Value: 0
+  colorSpace:
+    m_OverrideState: 0
+    m_Value: 0
+  computeShaderMode:
+    m_OverrideState: 0
+    m_Value: 1
+  enabled:
+    m_OverrideState: 0
     m_Value: 0
 --- !u!114 &1740593971184104649
 MonoBehaviour:
@@ -1483,8 +1518,8 @@ MonoBehaviour:
   m_Name: LPMVolume
   m_EditorClassIdentifier: 
   active: 1
-  Intensity:
-    m_OverrideState: 1
+  shoulder:
+    m_OverrideState: 0
     m_Value: 0
   HdrMax:
     m_OverrideState: 1
@@ -1512,6 +1547,15 @@ MonoBehaviour:
     m_Value: {x: 1, y: 0.5, z: 0.03125}
   displayMode:
     m_OverrideState: 1
+    m_Value: 0
+  colorSpace:
+    m_OverrideState: 0
+    m_Value: 0
+  computeShaderMode:
+    m_OverrideState: 0
+    m_Value: 1
+  enabled:
+    m_OverrideState: 0
     m_Value: 0
 --- !u!114 &3757684905497056274
 MonoBehaviour:
@@ -1548,7 +1592,7 @@ MonoBehaviour:
   m_Name: LPMVolume
   m_EditorClassIdentifier: 
   active: 1
-  Intensity:
+  shoulder:
     m_OverrideState: 1
     m_Value: 0
   HdrMax:
@@ -1576,6 +1620,15 @@ MonoBehaviour:
     m_OverrideState: 1
     m_Value: {x: 1, y: 0.5, z: 0.03125}
   displayMode:
+    m_OverrideState: 1
+    m_Value: 0
+  colorSpace:
+    m_OverrideState: 1
+    m_Value: 0
+  computeShaderMode:
+    m_OverrideState: 1
+    m_Value: 1
+  enabled:
     m_OverrideState: 1
     m_Value: 0
 --- !u!114 &4697571535380130960
@@ -1640,6 +1693,28 @@ MonoBehaviour:
     m_Value: 0
   enabled:
     m_OverrideState: 0
+    m_Value: 0
+--- !u!114 &6046568163861907648
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e326f41282331b4384ddf9dbd936bb6, type: 3}
+  m_Name: SinglePassBlurSetting
+  m_EditorClassIdentifier: 
+  active: 1
+  enabled:
+    m_OverrideState: 1
+    m_Value: 0
+  wavefrontOperation:
+    m_OverrideState: 1
+    m_Value: 0
+  fp16Packed:
+    m_OverrideState: 1
     m_Value: 0
 --- !u!114 &6212784953965881621
 MonoBehaviour:

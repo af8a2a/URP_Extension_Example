@@ -24,6 +24,11 @@
 #define FFX_COMMON_TYPES_H
 
 
+#define FFX_PARAMETER_IN        in
+#define FFX_PARAMETER_OUT       out
+#define FFX_PARAMETER_INOUT     inout
+#define FFX_PARAMETER_UNIFORM uniform
+
 
 #if defined(FFX_HLSL)
 

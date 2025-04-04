@@ -20,48 +20,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-/// @defgroup FfxGPU GPU
-/// The FidelityFX SDK GPU References
-/// 
-/// @ingroup ffxSDK
+void ffxOpAAddOneF3(FFX_PARAMETER_OUT FfxFloat32x3 d, FfxFloat32x3 a, FfxFloat32 b)
+{
+    d = a + ffxBroadcast3(b);
+}
 
-/// @defgroup FfxHLSL HLSL References
-/// FidelityFX SDK HLSL GPU References
-/// 
-/// @ingroup FfxGPU
+void ffxOpACpyF3(FFX_PARAMETER_OUT FfxFloat32x3 d, FfxFloat32x3 a)
+{
+    d = a;
+}
 
-/// @defgroup FfxGLSL GLSL References
-/// FidelityFX SDK GLSL GPU References
-/// 
-/// @ingroup FfxGPU
+void ffxOpAMulF3(FFX_PARAMETER_OUT FfxFloat32x3 d, FfxFloat32x3 a, FfxFloat32x3 b)
+{
+    d = a * b;
+}
 
-/// @defgroup FfxGPUEffects FidelityFX GPU References
-/// FidelityFX Effect GPU Reference Documentation
-/// 
-/// @ingroup FfxGPU
+void ffxOpAMulOneF3(FFX_PARAMETER_OUT FfxFloat32x3 d, FfxFloat32x3 a, FfxFloat32 b)
+{
+    d = a * b;
+}
 
-/// @defgroup GPUCore GPU Core
-/// GPU defines and functions
-/// 
-/// @ingroup FfxGPU
-
-#if !defined(FFX_CORE_H)
-#define FFX_CORE_H
-
-
-#include "ffx_common_types.hlsl"
-
-
-
-#if defined(FFX_HLSL) && defined(FFX_GPU)
-    #include "ffx_core_hlsl.hlsl"
-#endif // #if defined(FFX_HLSL) && defined(FFX_GPU)
-
-#if defined(FFX_GPU)
-    #include "ffx_core_gpu_common.hlsl"
-    #include "ffx_core_gpu_common_half.hlsl"
-    #include "ffx_core_portability.hlsl"
-#endif // #if defined(FFX_GPU)
-
-
-#endif // #if !defined(FFX_CORE_H)
+void ffxOpARcpF3(FFX_PARAMETER_OUT FfxFloat32x3 d, FfxFloat32x3 a)
+{
+    d = ffxReciprocal(a);
+}
