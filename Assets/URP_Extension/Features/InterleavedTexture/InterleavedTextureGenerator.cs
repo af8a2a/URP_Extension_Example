@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.RenderGraphModule;
 
 namespace Features.InterleavedTexture
 {
@@ -8,7 +9,7 @@ namespace Features.InterleavedTexture
     {
         private ComputeShader InterleavedTextureCS;
 
-        private static readonly Lazy<InterleavedTextureGenerator> _instance = new Lazy<InterleavedTextureGenerator>();
+        private static readonly Lazy<InterleavedTextureGenerator> _instance = new();
         public static InterleavedTextureGenerator Instance => _instance.Value;
 
         private static int _interleavedInputTextureID = Shader.PropertyToID("Input");
@@ -22,15 +23,14 @@ namespace Features.InterleavedTexture
             kernelID = InterleavedTextureCS.FindKernel("PrepareInterleavedTexture");
         }
 
-        
-        public RTHandle CreateTexture2DArray(CommandBuffer cmd, RTHandle rtInput,ref RTHandle rtOutput)
-        {
-            cmd.SetComputeTextureParam(InterleavedTextureCS, kernelID, _interleavedInputTextureID, rtInput);
-            cmd.SetComputeTextureParam(InterleavedTextureCS, kernelID, _interleavedResultTextureID, rtOutput);
 
-            cmd.DispatchCompute(InterleavedTextureCS, kernelID, 8, 8, 1);
-            
-            return rtOutput;
+        public void RenderInterleavedTexture(ComputeCommandBuffer cmd, TextureHandle textureInput,
+            TextureHandle resultTexture, int DispathX, int DispathY)
+        {
+            cmd.SetComputeTextureParam(InterleavedTextureCS, kernelID, _interleavedInputTextureID, textureInput);
+            cmd.SetComputeTextureParam(InterleavedTextureCS, kernelID, _interleavedResultTextureID, resultTexture);
+
+            cmd.DispatchCompute(InterleavedTextureCS, kernelID, DispathX, DispathY, 1);
         }
     }
 }

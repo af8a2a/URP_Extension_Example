@@ -377,7 +377,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b2db86121404754db890f4c8dfe81b2, type: 3}
   m_Name: Bloom
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   skipIterations:
     m_OverrideState: 1
     m_Value: 1
@@ -433,10 +433,10 @@ MonoBehaviour:
     m_Value: 256
   SoftGap:
     m_OverrideState: 1
-    m_Value: 0.159
+    m_Value: 0.629
   LPMExposure:
     m_OverrideState: 1
-    m_Value: 7.89
+    m_Value: 7.66
   Contrast:
     m_OverrideState: 1
     m_Value: 0.465
@@ -454,7 +454,7 @@ MonoBehaviour:
     m_Value: 0
   colorSpace:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 3
   computeShaderMode:
     m_OverrideState: 1
     m_Value: 1

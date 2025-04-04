@@ -370,7 +370,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33eac5601302433faab1e2923ca852ff, type: 3}
   m_Name: LumaPreservingMapper
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   shoulder:
     m_OverrideState: 1
     m_Value: 0
@@ -382,10 +382,10 @@ MonoBehaviour:
     m_Value: 0
   LPMExposure:
     m_OverrideState: 1
-    m_Value: 8
+    m_Value: 7.86
   Contrast:
     m_OverrideState: 1
-    m_Value: 0.3
+    m_Value: 1
   ShoulderContrast:
     m_OverrideState: 1
     m_Value: 1
@@ -397,10 +397,10 @@ MonoBehaviour:
     m_Value: {x: 1, y: 0.5, z: 0.03125}
   displayMode:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 2
   colorSpace:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 2
   computeShaderMode:
     m_OverrideState: 1
     m_Value: 1
