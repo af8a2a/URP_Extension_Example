@@ -262,6 +262,28 @@ MonoBehaviour:
   enabled:
     m_OverrideState: 1
     m_Value: 1
+--- !u!114 &-353639211571512006
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e326f41282331b4384ddf9dbd936bb6, type: 3}
+  m_Name: SinglePassBlurSetting
+  m_EditorClassIdentifier: 
+  active: 0
+  enabled:
+    m_OverrideState: 1
+    m_Value: 1
+  wavefrontOperation:
+    m_OverrideState: 1
+    m_Value: 1
+  fp16Packed:
+    m_OverrideState: 1
+    m_Value: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -283,6 +305,7 @@ MonoBehaviour:
   - {fileID: -394219664679543303}
   - {fileID: -2259969205498530629}
   - {fileID: 3423803413763770975}
+  - {fileID: -353639211571512006}
 --- !u!114 &422740205753480726
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -350,19 +373,16 @@ MonoBehaviour:
   active: 1
   shoulder:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0
   HdrMax:
     m_OverrideState: 1
     m_Value: 256
   SoftGap:
     m_OverrideState: 1
     m_Value: 0
-  Exposure:
-    m_OverrideState: 1
-    m_Value: 0
   LPMExposure:
     m_OverrideState: 1
-    m_Value: 8.63
+    m_Value: 8
   Contrast:
     m_OverrideState: 1
     m_Value: 0.3
@@ -380,7 +400,7 @@ MonoBehaviour:
     m_Value: 0
   colorSpace:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0
   computeShaderMode:
     m_OverrideState: 1
     m_Value: 1
@@ -495,9 +515,6 @@ MonoBehaviour:
     m_OverrideState: 1
     m_Value: 256
   SoftGap:
-    m_OverrideState: 1
-    m_Value: 0
-  Exposure:
     m_OverrideState: 1
     m_Value: 0
   LPMExposure:

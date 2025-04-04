@@ -404,7 +404,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 753f1a3241a42994db3b44868afc367f, type: 3}
   m_Name: SinglePassBlurFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   computeShader: {fileID: 7200000, guid: babcd188f67a9b3468bf0d697d345940, type: 3}
 --- !u!114 &8508543744943413698
 MonoBehaviour:

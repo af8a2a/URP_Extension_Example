@@ -54,7 +54,7 @@ struct LPMControlBlock
     FfxBoolean soft; // Use soft gamut mapping.
     FfxBoolean con2; // Use last RGB conversion matrix.
     FfxBoolean clip; // Use clipping in last conversion matrix.
-    FfxBoolean scaleOnly; 
+    FfxBoolean scaleOnly;
 };
 
 FFX_STATIC void LpmMatInv3x3(FFX_PARAMETER_OUT FfxFloat32x3 ox, FFX_PARAMETER_OUT FfxFloat32x3 oy,
@@ -180,7 +180,6 @@ FFX_STATIC void LpmColRgbToXyz(FFX_PARAMETER_OUT FfxFloat32x3 ox, FFX_PARAMETER_
 #if defined(LPM_NO_SETUP)
 FFX_STATIC void LpmSetupOut(FfxUInt32 i, FfxUInt32x4 v)
 {
-    
     // ctl[i] = v;
 }
 #endif  // #if defined(LPM_NO_SETUP)
@@ -269,16 +268,19 @@ FFX_STATIC void FfxCalculateLpmConsts(
     FfxFloat32 contrast, // Input range {0.0 (no extra contrast) to 1.0 (maximum contrast)}.
     FfxFloat32 shoulderContrast, // Shoulder shaping, 1.0 = no change (fast path).
     FfxFloat32x3 saturation, // A per channel adjustment, use <0 decrease, 0=no change, >0 increase.
-    FfxFloat32x3 crosstalk,// One channel must be 1.0, the rest can be <= 1.0 but not zero.
-    out FfxUInt32x4 map0,out FfxUInt32x4 map1,out FfxUInt32x4 map2,out FfxUInt32x4 map3,out FfxUInt32x4 map4,out FfxUInt32x4 map5,out FfxUInt32x4 map6,out FfxUInt32x4 map7,
-    out FfxUInt32x4 map8,out FfxUInt32x4 map9,out FfxUInt32x4 mapA,out FfxUInt32x4 mapB,out FfxUInt32x4 mapC,out FfxUInt32x4 mapD,out FfxUInt32x4 mapE,out FfxUInt32x4 mapF,
-    out FfxUInt32x4 mapG,out FfxUInt32x4 mapH,out FfxUInt32x4 mapI,out FfxUInt32x4 mapJ,out FfxUInt32x4 mapK,out FfxUInt32x4 mapL,out FfxUInt32x4 mapM,out FfxUInt32x4 mapN,
+    FfxFloat32x3 crosstalk, // One channel must be 1.0, the rest can be <= 1.0 but not zero.
+    out FfxUInt32x4 map0, out FfxUInt32x4 map1, out FfxUInt32x4 map2, out FfxUInt32x4 map3, out FfxUInt32x4 map4,
+    out FfxUInt32x4 map5, out FfxUInt32x4 map6, out FfxUInt32x4 map7,
+    out FfxUInt32x4 map8, out FfxUInt32x4 map9, out FfxUInt32x4 mapA, out FfxUInt32x4 mapB, out FfxUInt32x4 mapC,
+    out FfxUInt32x4 mapD, out FfxUInt32x4 mapE, out FfxUInt32x4 mapF,
+    out FfxUInt32x4 mapG, out FfxUInt32x4 mapH, out FfxUInt32x4 mapI, out FfxUInt32x4 mapJ, out FfxUInt32x4 mapK,
+    out FfxUInt32x4 mapL, out FfxUInt32x4 mapM, out FfxUInt32x4 mapN,
     out FfxBoolean outcon, // Use first RGB conversion matrix, if 'soft' then 'con' must be true also.
     out FfxBoolean outsoft, // Use soft gamut mapping.
     out FfxBoolean outcon2, // Use last RGB conversion matrix.
     out FfxBoolean outclip, // Use clipping in last conversion matrix.
     out FfxBoolean outscaleOnly // Scale only for last conversion matrix (used for 709 HDR to scRGB).
-    ) 
+)
 {
     outcon = con;
     outsoft = soft;
@@ -573,7 +575,17 @@ FFX_STATIC void FfxCalculateLpmConsts(
     mapE[1] = ffxPackHalf2x16(map20y);
     mapE[2] = ffxPackHalf2x16(map20z);
     mapE[3] = ffxPackHalf2x16(map20w);
-    LpmSetupOut(20, map20);
+    mapF = 0;
+    mapG = 0;
+    mapH = 0;
+    mapI = 0,
+        mapJ = 0,
+        mapK = 0,
+        mapL = 0,
+        mapM = 0,
+        mapN = 0,
+
+        LpmSetupOut(20, map20);
 }
 
 //==============================================================================================================================
@@ -1102,11 +1114,14 @@ void LpmFilter(
     FfxBoolean soft, // Use soft gamut mapping.
     FfxBoolean con2, // Use last RGB conversion matrix.
     FfxBoolean clip, // Use clipping in last conversion matrix.
-    FfxBoolean scaleOnly,// Scale only for last conversion matrix (used for 709 HDR to scRGB)
-    FfxUInt32x4 map0,FfxUInt32x4 map1,FfxUInt32x4 map2,FfxUInt32x4 map3,FfxUInt32x4 map4,FfxUInt32x4 map5,FfxUInt32x4 map6,FfxUInt32x4 map7,
-    FfxUInt32x4 map8,FfxUInt32x4 map9,FfxUInt32x4 mapA,FfxUInt32x4 mapB,FfxUInt32x4 mapC,FfxUInt32x4 mapD,FfxUInt32x4 mapE,FfxUInt32x4 mapF,
-    FfxUInt32x4 mapG,FfxUInt32x4 mapH,FfxUInt32x4 mapI,FfxUInt32x4 mapJ,FfxUInt32x4 mapK,FfxUInt32x4 mapL,FfxUInt32x4 mapM,FfxUInt32x4 mapN
-    )
+    FfxBoolean scaleOnly, // Scale only for last conversion matrix (used for 709 HDR to scRGB)
+    FfxUInt32x4 map0, FfxUInt32x4 map1, FfxUInt32x4 map2, FfxUInt32x4 map3, FfxUInt32x4 map4, FfxUInt32x4 map5,
+    FfxUInt32x4 map6, FfxUInt32x4 map7,
+    FfxUInt32x4 map8, FfxUInt32x4 map9, FfxUInt32x4 mapA, FfxUInt32x4 mapB, FfxUInt32x4 mapC, FfxUInt32x4 mapD,
+    FfxUInt32x4 mapE, FfxUInt32x4 mapF,
+    FfxUInt32x4 mapG, FfxUInt32x4 mapH, FfxUInt32x4 mapI, FfxUInt32x4 mapJ, FfxUInt32x4 mapK, FfxUInt32x4 mapL,
+    FfxUInt32x4 mapM, FfxUInt32x4 mapN
+)
 {
     // Grab control block, what is unused gets dead-code removal.
     // FfxUInt32x4 map0 = LpmFilterCtl(0);
@@ -1203,7 +1218,6 @@ void LpmFilterH(inout FfxFloat16x2 colorR,
     // FfxUInt32x4 mapN = LpmFilterCtl(23);
 
 
-    
     // Pre-limit inputs to provide enough head-room for computation in FP16.
     // TODO: Document this better!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     colorR = min(colorR, FFX_BROADCAST_FLOAT16X2(4096.0));

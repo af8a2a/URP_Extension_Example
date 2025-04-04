@@ -13,19 +13,18 @@ namespace Features.LPM
         private ComputeShader _computeShader;
         private int threadGroupWorkRegionDim = 16;
         private int kernelID;
-        private GraphicsBuffer buffer;
+        // private GraphicsBuffer buffer;
 
 
         public LumaPreservingMapperCSPass()
         {
-            BufferDesc desc = new BufferDesc(32, sizeof(UInt32));
-            buffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, 32, sizeof(UInt32));
+            // BufferDesc desc = new BufferDesc(32, sizeof(UInt32));
+            // buffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, 32, sizeof(UInt32));
         }
 
         public void Setup(ComputeShader computeShader)
         {
             requiresIntermediateTexture = true;
-            renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
             _computeShader = computeShader;
             kernelID = computeShader.FindKernel("LPM_CS");
         }
@@ -144,19 +143,16 @@ namespace Features.LPM
             HDROutputSettings mainDisplayHdrSettings = HDROutputSettings.main;
 
 
-            ColorGamut mainDisplayColorGamut = mainDisplayHdrSettings.active
-                ? mainDisplayHdrSettings.displayColorGamut
-                : ColorGamut.sRGB;
-
-            ColorPrimaries mainDisplayColorPrimaries = ColorGamutUtility.GetColorPrimaries(mainDisplayColorGamut);
-            var displayMinMaxLuminance = Vector2.zero;
-
-            if (cameraData.isHDROutputActive)
+            var displayMinMaxLuminance = new Vector2(0,100);
+            
+            if (mainDisplayHdrSettings.active)
             {
+                
                 displayMinMaxLuminance.x = cameraData.hdrDisplayInformation.minToneMapLuminance;
                 displayMinMaxLuminance.y = cameraData.hdrDisplayInformation.maxToneMapLuminance;
             }
 
+            
             using (var builder = renderGraph.AddComputePass<PassData>("LumaPreservingMapperCSPass", out var passData))
             {
                 passData.InputTexture = resourceData.activeColorTexture;
