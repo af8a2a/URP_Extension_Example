@@ -598,6 +598,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Sponza_Modular
       objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: 95bb2a04d0e84e84180dfc3eaef1db1d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5507921124106843438, guid: 95bb2a04d0e84e84180dfc3eaef1db1d,
         type: 3}
       propertyPath: m_IsActive

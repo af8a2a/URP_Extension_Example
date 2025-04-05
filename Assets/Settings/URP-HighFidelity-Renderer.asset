@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd26f52e40af4926b84f097248462ec8, type: 3}
   m_Name: GrabScreenBlurRendererFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
 --- !u!114 &-8967703998575992116
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -66,7 +66,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed925c60396c4dfe928d6e623b0fd179, type: 3}
   m_Name: DiffusionFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   renderPassEvent: 600
 --- !u!114 &-6176375078578449151
 MonoBehaviour:
@@ -80,7 +80,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c2b0ab9567497145b125dde0ad3a563, type: 3}
   m_Name: VolumetricLightFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   renderPassEvent: 550
 --- !u!114 &-5690443130314557284
 MonoBehaviour:
@@ -163,7 +163,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f3f560528c64a82bdfbba7b90c2d1bc, type: 3}
   m_Name: ScreenSpaceReflectionFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
 --- !u!114 &-2902112244124871261
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -281,7 +281,8 @@ MonoBehaviour:
   - {fileID: 3892018970804695259}
   - {fileID: 7973002900594852328}
   - {fileID: 2969682126515046944}
-  m_RendererFeatureMap: 0195c101971b49aabac34b1732461083a315a03e4aa0b9d70912a1b4490d447cd9868e4fccb0d8cc61dca0484708ee47acc60934b88808307bf2e728de5b1fb6b4b5f0202cc32eecc14784250a6a259b9c2ad8577d58d5e66a9bebb080822ad5db30e515a23a0336e8811d33e5cba56e208ac1f6286e3629
+  - {fileID: 3698440754958422030}
+  m_RendererFeatureMap: 0195c101971b49aabac34b1732461083a315a03e4aa0b9d70912a1b4490d447cd9868e4fccb0d8cc61dca0484708ee47acc60934b88808307bf2e728de5b1fb6b4b5f0202cc32eecc14784250a6a259b9c2ad8577d58d5e66a9bebb080822ad5db30e515a23a0336e8811d33e5cba56e208ac1f6286e36290ed01f7e45805333
   m_UseNativeRenderPass: 0
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -338,7 +339,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d930fd635444340abbf56d5862f04dd, type: 3}
   m_Name: PlayGroundFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
 --- !u!114 &3461166638362642092
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -352,6 +353,20 @@ MonoBehaviour:
   m_Name: ScratchFeature
   m_EditorClassIdentifier: 
   m_Active: 0
+--- !u!114 &3698440754958422030
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ee7be4fa29e460ab3cc5510ea25722e, type: 3}
+  m_Name: DummyFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  cs: {fileID: 7200000, guid: aa703a3ecc14420491b35d83f6881f06, type: 3}
 --- !u!114 &3892018970804695259
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -460,6 +475,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7120929398c73e440bffead9b1637d67, type: 3}
   m_Name: LPMFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   computeShader: {fileID: 7200000, guid: 44415e18d30d42b997ef7c0e70b65507, type: 3}
   renderPassEvent: 600
