@@ -17,6 +17,7 @@ namespace URP_Extension.Features.MipGenerator
         int m_ColorDownsampleKernel;
         int m_ColorGaussianKernel;
         int m_HizDownsampleKernel;
+        int m_PassThroughtKernel;
 
 
         public MipGenerator()
@@ -25,6 +26,7 @@ namespace URP_Extension.Features.MipGenerator
             m_ColorDownsampleKernel = m_ColorPyramidCS.FindKernel("KColorDownsample");
             m_ColorGaussianKernel = m_ColorPyramidCS.FindKernel("KColorGaussian");
             m_HizDownsampleKernel = m_ColorPyramidCS.FindKernel("KHizDownsample");
+            m_PassThroughtKernel=m_ColorPyramidCS.FindKernel("KPassthrought");
             m_PropertyBlock = new MaterialPropertyBlock();
         }
 
@@ -44,7 +46,7 @@ namespace URP_Extension.Features.MipGenerator
             m_TempDownsamplePyramid = RTHandles.Alloc(
                 Vector2.one * 0.5f,
                 dimension: source.dimension,
-                filterMode: FilterMode.Point,
+                filterMode: FilterMode.Bilinear,
                 colorFormat: destination.graphicsFormat,
                 enableRandomWrite: true,
                 useMipMap: false,
@@ -113,11 +115,11 @@ namespace URP_Extension.Features.MipGenerator
                     // Single pass blur
                     cmd.SetComputeVectorParam(m_ColorPyramidCS, "_Size",
                         new Vector4(dstMipWidth, dstMipHeight, 0f, 0f));
-                    cmd.SetComputeTextureParam(m_ColorPyramidCS, m_ColorGaussianKernel, "_Source",
+                    cmd.SetComputeTextureParam(m_ColorPyramidCS, m_PassThroughtKernel, "_Source",
                         m_TempDownsamplePyramid);
-                    cmd.SetComputeTextureParam(m_ColorPyramidCS, m_ColorGaussianKernel, "_Destination",
+                    cmd.SetComputeTextureParam(m_ColorPyramidCS, m_PassThroughtKernel, "_Destination",
                         destination, srcMipLevel + 1);
-                    cmd.DispatchCompute(m_ColorPyramidCS, m_ColorGaussianKernel, (dstMipWidth + 7) / 8,
+                    cmd.DispatchCompute(m_ColorPyramidCS, m_PassThroughtKernel, (dstMipWidth + 7) / 8,
                         (dstMipHeight + 7) / 8, 1);
                 }
 

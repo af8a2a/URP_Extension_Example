@@ -25,6 +25,7 @@
 #pragma kernel KColorGaussian
 #pragma kernel KColorDownsample
 #pragma kernel KHizDownsample
+#pragma kernel KPassthrought
 
 
 #define NO_ALPHA
@@ -174,12 +175,17 @@ void KPassthrought(uint2 groupId : SV_GroupID, uint2 groupThreadId : SV_GroupThr
                    uint3 dispatchThreadId : SV_DispatchThreadID)
 {
     // Upper-left pixel coordinate of quad that this thread will read
-    int2 threadUL = (groupThreadId << 1) + (groupId << 3) - 4;
-    uint2 uthreadUL = uint2(max(0, threadUL));
-
-    uint2 size = uint2(_Size.xy) - 1u;
-    float4 p00 = _Source[min(uthreadUL + uint2(0u, 0u), size)];
-    _Destination[dispatchThreadId.xy] = p00;
+    // int2 threadUL = (groupThreadId << 1) + (groupId << 3) - 4;
+    // uint2 uthreadUL = uint2(max(0, threadUL));
+    // uint2 offset = dispatchThreadId.xy;
+    // uint2 size = uint2(_Size.xy) - 1u;
+    //
+    // uint2 size = uint2(_Size.xy) - 1u;
+    float4 p00 = _Source[dispatchThreadId.xy];
+    // float4 p10 = _Source[min(uthreadUL + uint2(1u, 0u), size)];
+    // float4 p11 = _Source[min(uthreadUL + uint2(1u, 1u), size)];
+    // float4 p01 = _Source[min(uthreadUL + uint2(0u, 1u), size)];
+    _Destination[dispatchThreadId.xy] =p00;
     GroupMemoryBarrierWithGroupSync();
 }
 
