@@ -26,7 +26,7 @@ namespace URP_Extension.Features.MipGenerator
             m_ColorDownsampleKernel = m_ColorPyramidCS.FindKernel("KColorDownsample");
             m_ColorGaussianKernel = m_ColorPyramidCS.FindKernel("KColorGaussian");
             m_HizDownsampleKernel = m_ColorPyramidCS.FindKernel("KHizDownsample");
-            m_PassThroughtKernel=m_ColorPyramidCS.FindKernel("KPassthrought");
+            m_PassThroughtKernel = m_ColorPyramidCS.FindKernel("KPassthrought");
             m_PropertyBlock = new MaterialPropertyBlock();
         }
 
@@ -236,6 +236,76 @@ namespace URP_Extension.Features.MipGenerator
             }
 
             return srcMipLevel + 1;
+        }
+
+        public void RenderSinglePassGaussianCompatible(CommandBuffer cmd, Vector2Int size, Texture source,
+            RenderTexture destination)
+        {
+            int srcMipLevel = 0;
+            int srcMipWidth = size.x;
+            int srcMipHeight = size.y;
+            int slices = destination.volumeDepth;
+
+            // Check if format has changed since last time we generated mips
+            m_TempDownsamplePyramid = RTHandles.Alloc(
+                Vector2.one ,
+                dimension: source.dimension,
+                filterMode: FilterMode.Bilinear,
+                colorFormat: destination.graphicsFormat,
+                enableRandomWrite: true,
+                useMipMap: false,
+                useDynamicScale: true,
+                name: "Temporary Downsampled Pyramid"
+            );
+
+            cmd.SetRenderTarget(m_TempDownsamplePyramid);
+            cmd.ClearRenderTarget(false, true, Color.black);
+
+
+            bool isHardwareDrsOn = DynamicResolutionHandler.instance.HardwareDynamicResIsEnabled();
+            var hardwareTextureSize = new Vector2Int(source.width, source.height);
+            if (isHardwareDrsOn)
+                hardwareTextureSize = DynamicResolutionHandler.instance.ApplyScalesOnSize(hardwareTextureSize);
+
+            float sourceScaleX = (float)size.x / (float)hardwareTextureSize.x;
+            float sourceScaleY = (float)size.y / (float)hardwareTextureSize.y;
+
+            m_PropertyBlock.SetTexture("_BlitTexture", source);
+            m_PropertyBlock.SetVector("_BlitScaleBias", new Vector4(sourceScaleX, sourceScaleY, 0f, 0f));
+            m_PropertyBlock.SetFloat("_BlitMipLevel", 0f);
+            cmd.SetRenderTarget(destination, 0, CubemapFace.Unknown, -1);
+            cmd.SetViewport(new Rect(0, 0, srcMipWidth, srcMipHeight));
+
+            cmd.DrawProcedural(Matrix4x4.identity, Blitter.GetBlitMaterial(source.dimension), 0, MeshTopology.Triangles,
+                3, 1, m_PropertyBlock);
+            var finalTargetSize = new Vector2Int(destination.width, destination.height);
+            if (destination.useDynamicScale && isHardwareDrsOn)
+                finalTargetSize = DynamicResolutionHandler.instance.ApplyScalesOnSize(finalTargetSize);
+
+            // Note: smaller mips are excluded as we don't need them and the gaussian compute works
+            // on 8x8 blocks
+
+            cmd.SetComputeVectorParam(m_ColorPyramidCS, "_Size",
+                new Vector4(srcMipWidth, srcMipHeight, 0f, 0f));
+
+
+            // Downsample.
+            cmd.SetComputeTextureParam(m_ColorPyramidCS, m_ColorGaussianKernel, "_Source",
+                destination);
+            cmd.SetComputeTextureParam(m_ColorPyramidCS, m_ColorGaussianKernel, "_Destination",
+                m_TempDownsamplePyramid);
+            cmd.DispatchCompute(m_ColorPyramidCS, m_ColorGaussianKernel, (srcMipWidth) / 8,
+                (srcMipHeight) / 8, 1);
+
+            // // Single pass blur
+            // cmd.SetComputeVectorParam(m_ColorPyramidCS, "_Size",
+            //     new Vector4(srcMipWidth, srcMipHeight, 0f, 0f));
+            // cmd.SetComputeTextureParam(m_ColorPyramidCS, m_ColorGaussianKernel, "_Source",
+            //     m_TempDownsamplePyramid);
+            // cmd.SetComputeTextureParam(m_ColorPyramidCS, m_ColorGaussianKernel, "_Destination",
+            //     destination, srcMipLevel + 1);
+            // cmd.DispatchCompute(m_ColorPyramidCS, m_ColorGaussianKernel, srcMipWidth / 8,
+            //     srcMipHeight / 8, 1);
         }
     }
 }
