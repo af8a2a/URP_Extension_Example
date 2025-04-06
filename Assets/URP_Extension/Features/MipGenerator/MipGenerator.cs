@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.RenderGraphModule;
+using UnityEngine.Rendering.Universal;
 
 namespace URP_Extension.Features.MipGenerator
 {
@@ -19,6 +20,8 @@ namespace URP_Extension.Features.MipGenerator
         int m_HizDownsampleKernel;
         int m_PassThroughtKernel;
 
+        RenderTextureDescriptor m_ColorPyramidDescriptor;
+        RenderTextureDescriptor m_DepthPyramidDescriptor;
 
         public MipGenerator()
         {
@@ -26,8 +29,10 @@ namespace URP_Extension.Features.MipGenerator
             m_ColorDownsampleKernel = m_ColorPyramidCS.FindKernel("KColorDownsample");
             m_ColorGaussianKernel = m_ColorPyramidCS.FindKernel("KColorGaussian");
             m_HizDownsampleKernel = m_ColorPyramidCS.FindKernel("KHizDownsample");
-            m_PassThroughtKernel=m_ColorPyramidCS.FindKernel("KPassthrought");
+            m_PassThroughtKernel = m_ColorPyramidCS.FindKernel("KPassthrought");
             m_PropertyBlock = new MaterialPropertyBlock();
+            m_ColorPyramidDescriptor = new RenderTextureDescriptor();
+            m_DepthPyramidDescriptor = new RenderTextureDescriptor();
         }
 
         private static Lazy<MipGenerator> s_Instance = new Lazy<MipGenerator>(() => new MipGenerator());
@@ -42,17 +47,26 @@ namespace URP_Extension.Features.MipGenerator
             int srcMipWidth = size.x;
             int srcMipHeight = size.y;
 
+            m_DepthPyramidDescriptor = destination.descriptor;
+            m_DepthPyramidDescriptor.useDynamicScale = true;
+            m_DepthPyramidDescriptor.useMipMap = false;
+
             // Check if format has changed since last time we generated mips
-            m_TempDownsamplePyramid = RTHandles.Alloc(
+            RenderingUtils.ReAllocateHandleIfNeeded(ref m_TempDownsamplePyramid,
                 Vector2.one * 0.5f,
-                dimension: source.dimension,
-                filterMode: FilterMode.Bilinear,
-                colorFormat: destination.graphicsFormat,
-                enableRandomWrite: true,
-                useMipMap: false,
-                useDynamicScale: true,
-                name: "Temporary Downsampled Pyramid"
-            );
+                m_DepthPyramidDescriptor,
+                name: "Temporary Downsampled Pyramid");
+
+            // m_TempDownsamplePyramid = RTHandles.Alloc(
+            //     Vector2.one * 0.5f,
+            //     // dimension: source.dimension,
+            //     // filterMode: FilterMode.Bilinear,
+            //     colorFormat: destination.graphicsFormat,
+            //     enableRandomWrite: true,
+            //     useMipMap: false,
+            //     useDynamicScale: true,
+            //     name: "Temporary Downsampled Pyramid"
+            // );
 
             cmd.SetRenderTarget(m_TempDownsamplePyramid);
             cmd.ClearRenderTarget(false, true, Color.black);
@@ -145,19 +159,30 @@ namespace URP_Extension.Features.MipGenerator
             int srcMipLevel = 0;
             int srcMipWidth = size.x;
             int srcMipHeight = size.y;
-            int slices = destination.volumeDepth;
+
+            
+            
+            m_ColorPyramidDescriptor = destination.descriptor;
+            m_ColorPyramidDescriptor.useDynamicScale = true;
+            m_ColorPyramidDescriptor.useMipMap = false;
 
             // Check if format has changed since last time we generated mips
-            m_TempDownsamplePyramid = RTHandles.Alloc(
+            RenderingUtils.ReAllocateHandleIfNeeded(ref m_TempDownsamplePyramid,
                 Vector2.one * 0.5f,
-                dimension: source.dimension,
-                filterMode: FilterMode.Bilinear,
-                colorFormat: destination.graphicsFormat,
-                enableRandomWrite: true,
-                useMipMap: false,
-                useDynamicScale: true,
-                name: "Temporary Downsampled Pyramid"
-            );
+                m_ColorPyramidDescriptor,
+                name: "Temporary Downsampled Pyramid");
+
+            // // Check if format has changed since last time we generated mips
+            // m_TempDownsamplePyramid = RTHandles.Alloc(
+            //     Vector2.one * 0.5f,
+            //     dimension: source.dimension,
+            //     filterMode: FilterMode.Bilinear,
+            //     colorFormat: destination.graphicsFormat,
+            //     enableRandomWrite: true,
+            //     useMipMap: false,
+            //     useDynamicScale: true,
+            //     name: "Temporary Downsampled Pyramid"
+            // );
 
             cmd.SetRenderTarget(m_TempDownsamplePyramid);
             cmd.ClearRenderTarget(false, true, Color.black);

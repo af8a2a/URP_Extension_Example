@@ -1,0 +1,675 @@
+﻿/**********************************************************************
+Copyright (c) 2021 Advanced Micro Devices, Inc. All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+********************************************************************/
+#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+#pragma kernel Intersect
+// #pragma use_dxc
+#pragma enable_d3d11_debug_symbols
+
+
+static const float g_roughness_sigma_min = 0.01f;
+static const float g_roughness_sigma_max = 0.02f;
+static const float g_depth_sigma = 0.02f;
+CBUFFER_START(cb)
+    float g_temporal_stability_factor;
+    float g_depth_buffer_thickness;
+    float g_roughness_threshold;
+    float g_temporal_variance_threshold;
+    uint g_frame_index;
+    uint g_max_traversal_intersections;
+    uint g_min_traversal_occupancy;
+    uint g_most_detailed_mip;
+    uint g_samples_per_quad;
+    uint g_temporal_variance_guided_tracing_enabled;
+CBUFFER_END
+
+
+Texture2D<float4> g_lit_scene : register(t0);
+Texture2D<float> g_depth_buffer_hierarchy : register(t1);
+Texture2D<float4> g_normalSmoothness : register(t2);
+// Texture2D<float> g_roughness                                          : register(t3);
+// TextureCube g_environment_map                                         : register(t4);
+Texture2D<float2> g_blue_noise_texture : register(t5);
+
+// SamplerState g_environment_map_sampler                                : register(s0);
+
+RWTexture2D<float4> g_intersection_output : register(u0);
+
+
+#define M_PI                               3.14159265358979f
+
+//=== Common functions of the SssrSample ===
+
+uint PackFloat16(min16float2 v)
+{
+    uint2 p = f32tof16(float2(v));
+    return p.x | (p.y << 16);
+}
+
+min16float2 UnpackFloat16(uint a)
+{
+    float2 tmp = f16tof32(
+        uint2(a & 0xFFFF, a >> 16));
+    return min16float2(tmp);
+}
+
+// Transforms origin to uv space
+// Mat must be able to transform origin from its current space into clip space.
+float3 ProjectPosition(float3 origin, float4x4 mat)
+{
+    float4 projected = mul(mat, float4(origin, 1));
+    projected.xyz /= projected.w;
+    projected.xy = 0.5 * projected.xy + 0.5;
+    projected.y = (1 - projected.y);
+    return projected.xyz;
+}
+
+// Origin and direction must be in the same space and mat must be able to transform from that space into clip space.
+float3 ProjectDirection(float3 origin, float3 direction, float3 screen_space_origin, float4x4 mat)
+{
+    float3 offsetted = ProjectPosition(origin + direction, mat);
+    return offsetted - screen_space_origin;
+}
+
+// Mat must be able to transform origin from texture space to a linear space.
+float3 InvProjectPosition(float3 coord, float4x4 mat)
+{
+    coord.y = (1 - coord.y);
+    coord.xy = 2 * coord.xy - 1;
+    float4 projected = mul(mat, float4(coord, 1));
+    projected.xyz /= projected.w;
+    return projected.xyz;
+}
+
+
+float3 FFX_SSSR_LoadWorldSpaceNormal(int2 pixel_coordinate)
+{
+    return normalize(g_normalSmoothness.Load(int3(pixel_coordinate, 0)).xyz);
+}
+
+float FFX_SSSR_LoadDepth(int2 pixel_coordinate, int mip)
+{
+    return g_depth_buffer_hierarchy.Load(int3(pixel_coordinate, mip));
+}
+
+float3 FFX_SSSR_ScreenSpaceToViewSpace(float3 screen_space_position)
+{
+    return InvProjectPosition(screen_space_position, UNITY_MATRIX_I_P);
+}
+
+float3 ScreenSpaceToWorldSpace(float3 screen_space_position)
+{
+    return InvProjectPosition(screen_space_position,UNITY_MATRIX_I_VP);
+}
+
+// http://jcgt.org/published/0007/04/01/paper.pdf by Eric Heitz
+// Input Ve: view direction
+// Input alpha_x, alpha_y: roughness parameters
+// Input U1, U2: uniform random numbers
+// Output Ne: normal sampled with PDF D_Ve(Ne) = G1(Ve) * max(0, dot(Ve, Ne)) * D(Ne) / Ve.z
+float3 SampleGGXVNDF(float3 Ve, float alpha_x, float alpha_y, float U1, float U2)
+{
+    // Section 3.2: transforming the view direction to the hemisphere configuration
+    float3 Vh = normalize(float3(alpha_x * Ve.x, alpha_y * Ve.y, Ve.z));
+    // Section 4.1: orthonormal basis (with special case if cross product is zero)
+    float lensq = Vh.x * Vh.x + Vh.y * Vh.y;
+    float3 T1 = lensq > 0 ? float3(-Vh.y, Vh.x, 0) * rsqrt(lensq) : float3(1, 0, 0);
+    float3 T2 = cross(Vh, T1);
+    // Section 4.2: parameterization of the projected area
+    float r = sqrt(U1);
+    float phi = 2.0 * M_PI * U2;
+    float t1 = r * cos(phi);
+    float t2 = r * sin(phi);
+    float s = 0.5 * (1.0 + Vh.z);
+    t2 = (1.0 - s) * sqrt(1.0 - t1 * t1) + s * t2;
+    // Section 4.3: reprojection onto hemisphere
+    float3 Nh = t1 * T1 + t2 * T2 + sqrt(max(0.0, 1.0 - t1 * t1 - t2 * t2)) * Vh;
+    // Section 3.4: transforming the normal back to the ellipsoid configuration
+    float3 Ne = normalize(float3(alpha_x * Nh.x, alpha_y * Nh.y, max(0.0, Nh.z)));
+    return Ne;
+}
+
+float3 Sample_GGX_VNDF_Ellipsoid(float3 Ve, float alpha_x, float alpha_y, float U1, float U2)
+{
+    return SampleGGXVNDF(Ve, alpha_x, alpha_y, U1, U2);
+}
+
+float3 Sample_GGX_VNDF_Hemisphere(float3 Ve, float alpha, float U1, float U2)
+{
+    return Sample_GGX_VNDF_Ellipsoid(Ve, alpha, alpha, U1, U2);
+}
+
+float3x3 CreateTBN(float3 N)
+{
+    float3 U;
+    if (abs(N.z) > 0.0)
+    {
+        float k = sqrt(N.y * N.y + N.z * N.z);
+        U.x = 0.0;
+        U.y = -N.z / k;
+        U.z = N.y / k;
+    }
+    else
+    {
+        float k = sqrt(N.x * N.x + N.y * N.y);
+        U.x = N.y / k;
+        U.y = -N.x / k;
+        U.z = 0.0;
+    }
+
+    float3x3 TBN;
+    TBN[0] = U;
+    TBN[1] = cross(N, U);
+    TBN[2] = N;
+    return transpose(TBN);
+}
+
+float2 SampleRandomVector2D(uint2 pixel)
+{
+    return g_blue_noise_texture.Load(int3(pixel.xy % 1024, 0));
+}
+
+float3 SampleReflectionVector(float3 view_direction, float3 normal, float roughness, int2 dispatch_thread_id)
+{
+    float3x3 tbn_transform = CreateTBN(normal);
+    float3 view_direction_tbn = mul(-view_direction, tbn_transform);
+
+    float2 u = SampleRandomVector2D(dispatch_thread_id);
+
+    float3 sampled_normal_tbn = Sample_GGX_VNDF_Hemisphere(view_direction_tbn, roughness, u.x, u.y);
+    #ifdef PERFECT_REFLECTIONS
+        sampled_normal_tbn = float3(0, 0, 1); // Overwrite normal sample to produce perfect reflection.
+    #endif
+
+    float3 reflected_direction_tbn = reflect(-view_direction_tbn, sampled_normal_tbn);
+
+    // Transform reflected_direction back to the initial space.
+    float3x3 inv_tbn_transform = transpose(tbn_transform);
+    return mul(reflected_direction_tbn, inv_tbn_transform);
+}
+
+
+bool IsMirrorReflection(float roughness)
+{
+    return roughness < 0.0001;
+}
+
+#define FFX_SSSR_FLOAT_MAX                          3.402823466e+38
+
+void FFX_SSSR_InitialAdvanceRay(float3 origin, float3 direction, float3 inv_direction, float2 current_mip_resolution,
+                                float2 current_mip_resolution_inv, float2 floor_offset, float2 uv_offset,
+                                out float3 position, out float current_t)
+{
+    float2 current_mip_position = current_mip_resolution * origin.xy;
+
+    // Intersect ray with the half box that is pointing away from the ray origin.
+    float2 xy_plane = floor(current_mip_position) + floor_offset;
+    xy_plane = xy_plane * current_mip_resolution_inv + uv_offset;
+
+    // o + d * t = p' => t = (p' - o) / d
+    float2 t = xy_plane * inv_direction.xy - origin.xy * inv_direction.xy;
+    current_t = min(t.x, t.y);
+    position = origin + current_t * direction;
+}
+
+bool FFX_SSSR_AdvanceRay(float3 origin, float3 direction, float3 inv_direction, float2 current_mip_position,
+                         float2 current_mip_resolution_inv, float2 floor_offset, float2 uv_offset, float surface_z,
+                         inout float3 position, inout float current_t)
+{
+    // Create boundary planes
+    float2 xy_plane = floor(current_mip_position) + floor_offset;
+    xy_plane = xy_plane * current_mip_resolution_inv + uv_offset;
+    float3 boundary_planes = float3(xy_plane, surface_z);
+
+    // Intersect ray with the half box that is pointing away from the ray origin.
+    // o + d * t = p' => t = (p' - o) / d
+    float3 t = boundary_planes * inv_direction - origin * inv_direction;
+
+    // Prevent using z plane when shooting out of the depth buffer.
+    #ifdef UNITY_REVERSED_Z
+    t.z = direction.z < 0 ? t.z : FFX_SSSR_FLOAT_MAX;
+    #else
+    t.z = direction.z > 0 ? t.z : FFX_SSSR_FLOAT_MAX;
+    #endif
+
+    // Choose nearest intersection with a boundary.
+    float t_min = min(min(t.x, t.y), t.z);
+
+    #ifdef UNITY_REVERSED_Z
+    // Larger z means closer to the camera.
+    bool above_surface = surface_z < position.z;
+    #else
+    // Smaller z means closer to the camera.
+    bool above_surface = surface_z > position.z;
+    #endif
+
+    // Decide whether we are able to advance the ray until we hit the xy boundaries or if we had to clamp it at the surface.
+    // We use the asuint comparison to avoid NaN / Inf logic, also we actually care about bitwise equality here to see if t_min is the t.z we fed into the min3 above.
+    bool skipped_tile = asuint(t_min) != asuint(t.z) && above_surface;
+
+    // Make sure to only advance the ray if we're still above the surface.
+    current_t = above_surface ? t_min : current_t;
+
+    // Advance ray
+    position = origin + current_t * direction;
+
+    return skipped_tile;
+}
+
+float2 FFX_SSSR_GetMipResolution(float2 screen_dimensions, int mip_level)
+{
+    return screen_dimensions * pow(0.5, mip_level);
+}
+
+// Requires origin and direction of the ray to be in screen space [0, 1] x [0, 1]
+float3 FFX_SSSR_HierarchicalRaymarch(float3 origin, float3 direction, bool is_mirror, float2 screen_size,
+                                     int most_detailed_mip, uint min_traversal_occupancy,
+                                     uint max_traversal_intersections, out bool valid_hit)
+{
+    const float3 inv_direction = direction != 0 ? 1.0 / direction : FFX_SSSR_FLOAT_MAX;
+
+    // Start on mip with highest detail.
+    int current_mip = most_detailed_mip;
+
+    // Could recompute these every iteration, but it's faster to hoist them out and update them.
+    float2 current_mip_resolution = FFX_SSSR_GetMipResolution(screen_size, current_mip);
+    float2 current_mip_resolution_inv = rcp(current_mip_resolution);
+
+    // Offset to the bounding boxes uv space to intersect the ray with the center of the next pixel.
+    // This means we ever so slightly over shoot into the next region. 
+    float2 uv_offset = 0.005 * exp2(most_detailed_mip) / screen_size;
+    uv_offset = direction.xy < 0 ? -uv_offset : uv_offset;
+
+    // Offset applied depending on current mip resolution to move the boundary to the left/right upper/lower border depending on ray direction.
+    float2 floor_offset = direction.xy < 0 ? 0 : 1;
+
+    // Initially advance ray to avoid immediate self intersections.
+    float current_t;
+    float3 position;
+    FFX_SSSR_InitialAdvanceRay(origin, direction, inv_direction, current_mip_resolution, current_mip_resolution_inv,
+                               floor_offset, uv_offset, position, current_t);
+
+    bool exit_due_to_low_occupancy = false;
+    int i = 0;
+    while (i < max_traversal_intersections && current_mip >= most_detailed_mip && !exit_due_to_low_occupancy)
+    {
+        float2 current_mip_position = current_mip_resolution * position.xy;
+        float surface_z = FFX_SSSR_LoadDepth(current_mip_position, current_mip);
+        exit_due_to_low_occupancy = !is_mirror; // && WaveActiveCountBits(true) <= min_traversal_occupancy;
+        bool skipped_tile = FFX_SSSR_AdvanceRay(origin, direction, inv_direction, current_mip_position,
+                                                current_mip_resolution_inv, floor_offset, uv_offset, surface_z,
+                                                position, current_t);
+        current_mip += skipped_tile ? 1 : -1;
+        current_mip_resolution *= skipped_tile ? 0.5 : 2;
+        current_mip_resolution_inv *= skipped_tile ? 2 : 0.5;
+        ++i;
+    }
+
+    valid_hit = (i <= max_traversal_intersections);
+
+    return position;
+}
+
+float FFX_SSSR_ValidateHit(float3 hit, float2 uv, float3 world_space_ray_direction, float2 screen_size,
+                           float depth_buffer_thickness)
+{
+    // Reject hits outside the view frustum
+    if (any(hit.xy < 0) || any(hit.xy > 1))
+    {
+        return 0;
+    }
+
+    // Reject the hit if we didnt advance the ray significantly to avoid immediate self reflection
+    float2 manhattan_dist = abs(hit.xy - uv);
+    if (all(manhattan_dist < (2 / screen_size)))
+    {
+        return 0;
+    }
+
+    // Don't lookup radiance from the background.
+    int2 texel_coords = int2(screen_size * hit.xy);
+    float surface_z = FFX_SSSR_LoadDepth(texel_coords / 2, 1);
+    #ifdef UNITY_REVERSED_Z
+    if (surface_z == 0.0)
+    {
+        #else
+    if (surface_z == 1.0)
+    {
+        #endif
+        return 0;
+    }
+
+    // We check if we hit the surface from the back, these should be rejected.
+    float3 hit_normal = FFX_SSSR_LoadWorldSpaceNormal(texel_coords);
+    if (dot(hit_normal, world_space_ray_direction) > 0)
+    {
+        return 0;
+    }
+
+    float3 view_space_surface = FFX_SSSR_ScreenSpaceToViewSpace(float3(hit.xy, surface_z));
+    float3 view_space_hit = FFX_SSSR_ScreenSpaceToViewSpace(hit);
+    float distance = length(view_space_surface - view_space_hit);
+
+    // Fade out hits near the screen borders
+    float2 fov = 0.05 * float2(screen_size.y / screen_size.x, 1);
+    float2 border = smoothstep(0, fov, hit.xy) * (1 - smoothstep(1 - fov, 1, hit.xy));
+    float vignette = border.x * border.y;
+
+    // We accept all hits that are within a reasonable minimum distance below the surface.
+    // Add constant in linear space to avoid growing of the reflections toward the reflected objects.
+    float confidence = 1 - smoothstep(0, depth_buffer_thickness, distance);
+    confidence *= confidence;
+
+    return vignette * confidence;
+}
+
+
+float4 RayMarch(float3 viewDir, int NumSteps, float3 viewPos, float3 screenPos, float2 uv, float thickness)
+{
+    float4 rayProj = mul(UNITY_MATRIX_P, float4(viewDir + viewPos, 1.0f));
+    float3 rayDir = normalize(rayProj.xyz / rayProj.w - screenPos);
+    rayDir.xy *= 0.5;
+    float3 rayStart = float3(uv, screenPos.z);
+
+    float2 screen_size;
+    g_depth_buffer_hierarchy.GetDimensions(screen_size.x, screen_size.y);
+
+    float2 screenDelta2 = rcp(screen_size);
+
+    float d = clamp(rayStart.xy, rayStart.xy + rayDir.xy, screenDelta2);
+    float3 samplePos = rayStart + rayDir * d;
+    int level = 0;
+
+    float mask = 0;
+    [loop]
+    for (int i = 0; i < NumSteps; i++)
+    {
+        float2 currentDelta = screenDelta2 * exp2(level + 1);
+        float distnace = clamp(samplePos.xy, samplePos.xy + rayDir.xy, currentDelta);
+        float3 nextSamplePos = samplePos + rayDir * distnace;
+        float sampleMinDepth = g_depth_buffer_hierarchy.SampleLevel(sampler_LinearClamp, nextSamplePos.xy, level);
+        float nextDepth = nextSamplePos.z;
+
+        [flatten]
+        if (sampleMinDepth < nextDepth)
+        {
+            level = min(level + 1, 6);
+            samplePos = nextSamplePos;
+        }
+        else
+        {
+            level--;
+        }
+
+        [branch]
+        if (level < 0)
+        {
+            float delta = (-LinearEyeDepth(sampleMinDepth, _ZBufferParams)) - (-LinearEyeDepth(
+                samplePos.z, _ZBufferParams));
+            mask = delta <= thickness && i > 0;
+            return float4(samplePos, mask);
+        }
+    }
+    return float4(samplePos, mask);
+}
+
+// Brian Karis, Epic Games "Real Shading in Unreal Engine 4"
+float4 ImportanceSampleGGX(float2 Xi, float Roughness)
+{
+    float m = Roughness * Roughness;
+    float m2 = m * m;
+
+    float Phi = 2 * PI * Xi.x;
+
+    float CosTheta = sqrt((1.0 - Xi.y) / (1.0 + (m2 - 1.0) * Xi.y));
+    float SinTheta = sqrt(max(1e-5, 1.0 - CosTheta * CosTheta));
+
+    float3 H;
+    H.x = SinTheta * cos(Phi);
+    H.y = SinTheta * sin(Phi);
+    H.z = CosTheta;
+
+    float d = (CosTheta * m2 - CosTheta) * CosTheta + 1;
+    float D = m2 / (PI * d * d);
+    float pdf = D * CosTheta;
+
+    return float4(H, pdf);
+}
+
+float4 TangentToWorld(float3 N, float4 H)
+{
+    float3 UpVector = abs(N.z) < 0.999 ? float3(0.0, 0.0, 1.0) : float3(1.0, 0.0, 0.0);
+    float3 T = normalize(cross(UpVector, N));
+    float3 B = cross(N, T);
+
+    return float4((T * H.x) + (B * H.y) + (N * H.z), H.w);
+}
+
+float3 GetWorldPos(float3 screenPos)
+{
+    float4 worldPos = mul(UNITY_MATRIX_I_VP, float4(screenPos, 1));
+    return worldPos.xyz / worldPos.w;
+}
+
+float3 GetViewPos(float3 screenPos)
+{
+    float4 viewPos = mul(UNITY_MATRIX_I_P, float4(screenPos, 1));
+    return viewPos.xyz / viewPos.w;
+}
+
+float3 GetScreenPos(float2 uv, float depth)
+{
+    return float3(uv * 2 - 1, depth);
+}
+
+
+#define RAY_TRACE_EPS 0.00024414
+
+// TODO: It is not really possible to share all of this with SSR for couple reason, but it probably possible share a part of it
+bool HDRPRayMarch(float3 positionWS, float3 sampleDir, float3 normalWS, float2 positionSS, float deviceDepth,
+                  bool killRay, out float3 rayPos)
+{
+    // Initialize ray pos to invalid value
+    rayPos = float3(-1.0, -1.0, -1.0);
+
+    // Due to a warning on Vulkan and Metal if returning early, this is the only way we found to avoid it.
+    bool status = false;
+
+    // We start tracing from the center of the current pixel, and do so up to the far plane.
+    float3 rayOrigin = float3(positionSS + 0.5, deviceDepth);
+
+    float3 reflPosWS = positionWS + sampleDir;
+    float3 reflPosNDC = ComputeNormalizedDeviceCoordinatesWithZ(reflPosWS, UNITY_MATRIX_VP); // Jittered
+    float3 reflPosSS = float3(reflPosNDC.xy * _ScreenSize.xy, reflPosNDC.z);
+    float3 rayDir = reflPosSS - rayOrigin;
+    float3 rcpRayDir = rcp(rayDir);
+    int2 rayStep = int2(rcpRayDir.x >= 0 ? 1 : 0,
+                        rcpRayDir.y >= 0 ? 1 : 0);
+    float3 raySign = float3(rcpRayDir.x >= 0 ? 1 : -1,
+                            rcpRayDir.y >= 0 ? 1 : -1,
+                            rcpRayDir.z >= 0 ? 1 : -1);
+    bool rayTowardsEye = rcpRayDir.z >= 0;
+
+    killRay = killRay || (reflPosSS.z <= 0);
+
+    // If the point is behind the camera or the ray is invalid, this ray should not be cast
+    if (!killRay)
+    {
+        // Extend and clip the end point to the frustum.
+        float tMax;
+        {
+            // Shrink the frustum by half a texel for efficiency reasons.
+            const float halfTexel = 0.5;
+
+            float3 bounds;
+            bounds.x = (rcpRayDir.x >= 0) ? _ScreenSize.x - halfTexel : halfTexel;
+            bounds.y = (rcpRayDir.y >= 0) ? _ScreenSize.y - halfTexel : halfTexel;
+            // If we do not want to intersect the skybox, it is more efficient to not trace too far.
+            float maxDepth = 0.00000024; // 2^-22
+            bounds.z = (rcpRayDir.z >= 0) ? 1 : maxDepth;
+
+            float3 dist = bounds * rcpRayDir - (rayOrigin * rcpRayDir);
+            tMax = Min3(dist.x, dist.y, dist.z);
+        }
+
+        // Start ray marching from the next texel to avoid self-intersections.
+        float t;
+        {
+            // 'rayOrigin' is the exact texel center.
+            float2 dist = abs(0.5 * rcpRayDir.xy);
+            t = min(dist.x, dist.y);
+        }
+
+        int mipLevel = 0;
+        // int2 mipOffset = _DepthPyramidMipLevelOffsets[mipLevel];
+        int iterCount = 0;
+        bool hit = false;
+        bool miss = false;
+        bool belowMip0 = false; // This value is set prior to entering the cell
+
+        while (!(hit || miss) && (t <= tMax) && (iterCount < g_max_traversal_intersections))
+        {
+            rayPos = rayOrigin + t * rayDir;
+
+            // Ray position often ends up on the edge. To determine (and look up) the right cell,
+            // we need to bias the position by a small epsilon in the direction of the ray.
+            float2 sgnEdgeDist = round(rayPos.xy) - rayPos.xy;
+            float2 satEdgeDist = clamp(raySign.xy * sgnEdgeDist + RAY_TRACE_EPS, 0, RAY_TRACE_EPS);
+            rayPos.xy += raySign.xy * satEdgeDist;
+
+            int2 mipCoord = (int2)rayPos.xy >> mipLevel;
+            // Bounds define 4 faces of a cube:
+            // 2 walls in front of the ray, and a floor and a base below it.
+            float4 bounds;
+
+            bounds.z = LOAD_TEXTURE2D_LOD(g_depth_buffer_hierarchy, mipCoord, mipLevel).r;
+            bounds.xy = (mipCoord + rayStep) << mipLevel;
+
+            // We define the depth of the base as the depth value as:
+            // b = DeviceDepth((1 + thickness) * LinearDepth(d))
+            // b = ((f - n) * d + n * (1 - (1 + thickness))) / ((f - n) * (1 + thickness))
+            // b = ((f - n) * d - n * thickness) / ((f - n) * (1 + thickness))
+            // b = d / (1 + thickness) - n / (f - n) * (thickness / (1 + thickness))
+            // b = d * k_s + k_b
+            bounds.w = bounds.z * 1 + 0.1;
+
+            float4 dist = bounds * rcpRayDir.xyzz - (rayOrigin.xyzz * rcpRayDir.xyzz);
+            float distWall = min(dist.x, dist.y);
+            float distFloor = dist.z;
+            float distBase = dist.w;
+
+            // Note: 'rayPos' given by 't' can correspond to one of several depth values:
+            // - above or exactly on the floor
+            // - inside the floor (between the floor and the base)
+            // - below the base
+            bool belowFloor = rayPos.z < bounds.z;
+            bool aboveBase = rayPos.z >= bounds.w;
+
+            bool insideFloor = belowFloor && aboveBase;
+            bool hitFloor = (t <= distFloor) && (distFloor <= distWall);
+
+            // Game rules:
+            // * if the closest intersection is with the wall of the cell, switch to the coarser MIP, and advance the ray.
+            // * if the closest intersection is with the heightmap below,  switch to the finer   MIP, and advance the ray.
+            // * if the closest intersection is with the heightmap above,  switch to the finer   MIP, and do NOT advance the ray.
+            // Victory conditions:
+            // * See below. Do NOT reorder the statements!
+
+            miss = belowMip0 && insideFloor;
+            hit = (mipLevel == 0) && (hitFloor || insideFloor);
+            belowMip0 = (mipLevel == 0) && belowFloor;
+
+            // 'distFloor' can be smaller than the current distance 't'.
+            // We can also safely ignore 'distBase'.
+            // If we hit the floor, it's always safe to jump there.
+            // If we are at (mipLevel != 0) and we are below the floor, we should not move.
+            t = hitFloor ? distFloor : (((mipLevel != 0) && belowFloor) ? t : distWall);
+            rayPos.z = bounds.z; // Retain the depth of the potential intersection
+
+            // Warning: both rays towards the eye, and tracing behind objects has linear
+            // rather than logarithmic complexity! This is due to the fact that we only store
+            // the maximum value of depth, and not the min-max.
+            mipLevel += (hitFloor || belowFloor || rayTowardsEye) ? -1 : 1;
+            mipLevel = clamp(mipLevel, 0, 6);
+            // mipOffset = _DepthPyramidMipLevelOffsets[mipLevel];
+            // mipLevel = 0;
+
+            iterCount++;
+        }
+
+        // Treat intersections with the sky as misses.
+        miss = miss /*|| ((_RayMarchingReflectsSky == 0)*/ && (rayPos.z == 0);
+        status = hit && !miss;
+    }
+    return status;
+}
+
+
+[numthreads(8, 8, 1)]
+void Intersect(uint3 dispatchThreadId : SV_DispatchThreadID)
+{
+    int2 coords = dispatchThreadId.xy;
+    float4 gbuffer = g_normalSmoothness[coords];
+    float depth = g_depth_buffer_hierarchy[coords].r;
+
+    float2 dimensions;
+    g_depth_buffer_hierarchy.GetDimensions(dimensions.x, dimensions.y);
+
+    #if !UNITY_REVERSED_Z
+        depth = lerp(UNITY_NEAR_CLIP_VALUE, 1, depth);
+    #endif
+    bool isBackground;
+    #if (UNITY_REVERSED_Z == 1)
+    isBackground = depth == 0.0 ? true : false;
+    #else
+        isBackground = depth == 1.0 ? true : false; // OpenGL Platforms.
+    #endif
+    if (isBackground)
+    {
+        g_intersection_output[coords] = g_lit_scene[coords];
+    }
+
+    float3 normalWS = gbuffer.xyz;
+    float smoothness = gbuffer.w;
+
+    float2 uv = GetNormalizedScreenSpaceUV(coords * rcp(dimensions));
+    float3 positionWS = ComputeWorldSpacePosition(uv, depth,UNITY_MATRIX_I_VP);
+
+    half3 invViewDirWS;
+    if (unity_OrthoParams.w == 0.0)
+        invViewDirWS = normalize(positionWS - _WorldSpaceCameraPos);
+    else
+        invViewDirWS = -normalize(UNITY_MATRIX_V[2].xyz);
+
+    float3 rayPositionWS;
+    float3 direction = reflect(invViewDirWS, normalWS);
+    half dither = g_blue_noise_texture.SampleLevel(sampler_LinearRepeat, uv, 0).x;
+    if (HDRPRayMarch(positionWS, direction, normalWS, uv, depth, false, rayPositionWS))
+    {
+        float4 rayPositionCS = TransformWorldToHClip(rayPositionWS);
+        g_intersection_output[coords] = g_lit_scene[dimensions * GetNormalizedScreenSpaceUV(rayPositionCS)];
+    }
+    else
+    {
+        g_intersection_output[coords] = g_lit_scene[coords];
+    }
+    // g_intersection_output[coords] = float4(lerp(sceneColor, reflectColor,saturate(reflectivity + fresnel) * EdgeOfScreenFade(uv)), 1); //float4(hit.xy,0,1);
+}

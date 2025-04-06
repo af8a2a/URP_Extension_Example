@@ -150,7 +150,7 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing
                 builder.SetGlobalTextureAfterPass(gBuffer0Handle, _GBuffer0);
                 builder.SetGlobalTextureAfterPass(gBuffer1Handle, _GBuffer1);
                 builder.SetGlobalTextureAfterPass(gBuffer2Handle, _GBuffer2);
-
+                resourceData.gBuffer = new[] { gBuffer0Handle, gBuffer1Handle, gBuffer2Handle };
                 // We disable culling for this pass for the demonstrative purpose of this sample, as normally this pass would be culled,
                 // since the destination texture is not used anywhere else
                 //builder.AllowGlobalStateModification(true);
