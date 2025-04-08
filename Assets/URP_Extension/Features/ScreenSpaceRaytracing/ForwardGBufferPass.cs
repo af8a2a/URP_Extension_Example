@@ -20,7 +20,6 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing
         private static readonly int _GBuffer0 = Shader.PropertyToID("_GBuffer0");
         private static readonly int _GBuffer1 = Shader.PropertyToID("_GBuffer1");
         private static readonly int _GBuffer2 = Shader.PropertyToID("_GBuffer2");
-
         public ForwardGBufferPass(string[] PassNames)
         {
             profilingSampler = new ProfilingSampler(nameof(ForwardGBufferPass));
@@ -159,6 +158,10 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing
                 // Assign the ExecutePass function to the render pass delegate, which will be called by the render graph when executing the pass
                 builder.SetRenderFunc((PassData data, RasterGraphContext context) => ExecutePass(data, context));
             }
+        }
+
+        public void Dispose()
+        {
         }
     }
 }
