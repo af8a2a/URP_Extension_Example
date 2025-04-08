@@ -1106,6 +1106,7 @@ MonoBehaviour:
   - {fileID: 6212784953965881621}
   - {fileID: 6046568163861907648}
   - {fileID: 1598001243899308306}
+  - {fileID: 4252473499290682436}
 --- !u!114 &19268007692184746
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -1294,9 +1295,6 @@ MonoBehaviour:
     m_OverrideState: 1
     m_Value: 256
   SoftGap:
-    m_OverrideState: 1
-    m_Value: 0
-  Exposure:
     m_OverrideState: 1
     m_Value: 0
   LPMExposure:
@@ -1527,9 +1525,6 @@ MonoBehaviour:
   SoftGap:
     m_OverrideState: 1
     m_Value: 0
-  Exposure:
-    m_OverrideState: 1
-    m_Value: 0
   LPMExposure:
     m_OverrideState: 1
     m_Value: 8
@@ -1601,9 +1596,6 @@ MonoBehaviour:
   SoftGap:
     m_OverrideState: 1
     m_Value: 0
-  Exposure:
-    m_OverrideState: 1
-    m_Value: 0
   LPMExposure:
     m_OverrideState: 1
     m_Value: 8
@@ -1631,6 +1623,71 @@ MonoBehaviour:
   enabled:
     m_OverrideState: 1
     m_Value: 0
+--- !u!114 &4252473499290682436
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7170cdcc10774c10b23f0a7bf88aab69, type: 3}
+  m_Name: ScreenSpacePathTracing
+  m_EditorClassIdentifier: 
+  active: 1
+  state:
+    m_OverrideState: 1
+    m_Value: 0
+  maximumSamples:
+    m_OverrideState: 1
+    m_Value: 256
+  maximumDepth:
+    m_OverrideState: 1
+    m_Value: 4
+  maximumIntensity:
+    m_OverrideState: 1
+    m_Value: 10
+  samplesPerPixel:
+    m_OverrideState: 1
+    m_Value: 1
+  maximumSteps:
+    m_OverrideState: 1
+    m_Value: 24
+  stepSize:
+    m_OverrideState: 1
+    m_Value: 0.4
+  noiseMethod:
+    m_OverrideState: 1
+    m_Value: 0
+  denoiser:
+    m_OverrideState: 1
+    m_Value: 1
+  accumFactor:
+    m_OverrideState: 1
+    m_Value: 0.9
+  ambientStored:
+    m_OverrideState: 1
+    m_Value: 0
+  ambientIntensity:
+    m_OverrideState: 1
+    m_Value: 1
+  ambientLight:
+    m_OverrideState: 1
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
+    hdr: 0
+  ambientGroundColor:
+    m_OverrideState: 1
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
+    hdr: 0
+  ambientEquatorColor:
+    m_OverrideState: 1
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
+    hdr: 0
+  ambientSkyColor:
+    m_OverrideState: 1
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
+    hdr: 0
 --- !u!114 &4697571535380130960
 MonoBehaviour:
   m_ObjectHideFlags: 3

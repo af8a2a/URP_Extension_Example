@@ -165,6 +165,7 @@ MonoBehaviour:
   - {fileID: 2707684693543764708}
   - {fileID: -149540311801507145}
   - {fileID: 8283926697528027518}
+  - {fileID: 9129909018628741393}
 --- !u!114 &849379129802519247
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -424,7 +425,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33eac5601302433faab1e2923ca852ff, type: 3}
   m_Name: LPMVolume
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   shoulder:
     m_OverrideState: 1
     m_Value: 1
@@ -503,3 +504,68 @@ MonoBehaviour:
   fp16Packed:
     m_OverrideState: 1
     m_Value: 1
+--- !u!114 &9129909018628741393
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7170cdcc10774c10b23f0a7bf88aab69, type: 3}
+  m_Name: ScreenSpacePathTracing
+  m_EditorClassIdentifier: 
+  active: 1
+  state:
+    m_OverrideState: 1
+    m_Value: 0
+  maximumSamples:
+    m_OverrideState: 0
+    m_Value: 256
+  maximumDepth:
+    m_OverrideState: 0
+    m_Value: 4
+  maximumIntensity:
+    m_OverrideState: 0
+    m_Value: 10
+  samplesPerPixel:
+    m_OverrideState: 0
+    m_Value: 1
+  maximumSteps:
+    m_OverrideState: 0
+    m_Value: 24
+  stepSize:
+    m_OverrideState: 0
+    m_Value: 0.4
+  noiseMethod:
+    m_OverrideState: 0
+    m_Value: 0
+  denoiser:
+    m_OverrideState: 0
+    m_Value: 1
+  accumFactor:
+    m_OverrideState: 0
+    m_Value: 0.9
+  ambientStored:
+    m_OverrideState: 0
+    m_Value: 0
+  ambientIntensity:
+    m_OverrideState: 0
+    m_Value: 1
+  ambientLight:
+    m_OverrideState: 0
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
+    hdr: 0
+  ambientGroundColor:
+    m_OverrideState: 0
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
+    hdr: 0
+  ambientEquatorColor:
+    m_OverrideState: 0
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
+    hdr: 0
+  ambientSkyColor:
+    m_OverrideState: 0
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
+    hdr: 0

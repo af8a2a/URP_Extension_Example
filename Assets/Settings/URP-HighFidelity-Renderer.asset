@@ -39,7 +39,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 813f2c3541ba4c6c86b8a5e8e9d5336e, type: 3}
   m_Name: StochasticScreenSpaceReflectionFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   cubemap: {fileID: 8900000, guid: 42c8d975867dbb34299217c9b3a62677, type: 3}
 --- !u!114 &-8046564352974730807
 MonoBehaviour:
@@ -297,7 +297,8 @@ MonoBehaviour:
   - {fileID: 2969682126515046944}
   - {fileID: 3698440754958422030}
   - {fileID: -8938788327179079504}
-  m_RendererFeatureMap: 0195c101971b49aabac34b1732461083a315a03e4aa0b9d70912a1b4490d447cd9868e4fccb0d8cc61dca0484708ee47acc60934b88808307bf2e728de5b1fb6b4b5f0202cc32eecc14784250a6a259b9c2ad8577d58d5e66a9bebb080822ad5db30e515a23a0336e8811d33e5cba56e208ac1f6286e36290ed01f7e45805333b030154c600bf383
+  - {fileID: 4588228478148881060}
+  m_RendererFeatureMap: 0195c101971b49aabac34b1732461083a315a03e4aa0b9d70912a1b4490d447cd9868e4fccb0d8cc61dca0484708ee47acc60934b88808307bf2e728de5b1fb6b4b5f0202cc32eecc14784250a6a259b9c2ad8577d58d5e66a9bebb080822ad5db30e515a23a0336e8811d33e5cba56e208ac1f6286e36290ed01f7e45805333b030154c600bf383a42a65cc7da9ac3f
   m_UseNativeRenderPass: 0
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -395,6 +396,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 0
   computeShader: {fileID: 7200000, guid: e0a62cf8f93b4da439ba6c1df01269a4, type: 3}
+--- !u!114 &4588228478148881060
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f028d412f79146a9910b0ea247d73af1, type: 3}
+  m_Name: ScreenSpacePathTracingFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  m_PathTracingMaterial: {fileID: 2100000, guid: e3042e4e812b16e448a5774ba2fdc419,
+    type: 2}
+  accurateThickness: 1
+  refraction: 0
+  progressBar: 1
+  spatialDenoise: 1
 --- !u!114 &5181395248709815091
 MonoBehaviour:
   m_ObjectHideFlags: 0
