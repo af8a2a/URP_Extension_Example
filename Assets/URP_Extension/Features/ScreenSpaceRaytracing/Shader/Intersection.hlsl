@@ -137,9 +137,9 @@
 //     return mul(reflected_direction_tbn, inv_tbn_transform);
 // }
 //
-// float3 SampleEnvironmentMap(float3 direction) {
-//     return g_environment_map.SampleLevel(g_environment_map_sampler, direction, 0).xyz;
-// }
+// // float3 SampleEnvironmentMap(float3 direction) {
+// //     return g_environment_map.SampleLevel(g_environment_map_sampler, direction, 0).xyz;
+// // }
 //
 // bool IsMirrorReflection(float roughness) {
 //     return roughness < 0.0001;

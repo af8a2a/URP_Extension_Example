@@ -516,56 +516,56 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7170cdcc10774c10b23f0a7bf88aab69, type: 3}
   m_Name: ScreenSpacePathTracing
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   state:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 1
   maximumSamples:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 256
   maximumDepth:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 4
   maximumIntensity:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 10
   samplesPerPixel:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 1
   maximumSteps:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 24
   stepSize:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0.4
   noiseMethod:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0
   denoiser:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 1
   accumFactor:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0.9
   ambientStored:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0
   ambientIntensity:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 1
   ambientLight:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: {r: 0, g: 0, b: 0, a: 1}
     hdr: 0
   ambientGroundColor:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: {r: 0, g: 0, b: 0, a: 1}
     hdr: 0
   ambientEquatorColor:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: {r: 0, g: 0, b: 0, a: 1}
     hdr: 0
   ambientSkyColor:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: {r: 0, g: 0, b: 0, a: 1}
     hdr: 0

@@ -14,6 +14,7 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing.StochasticScreenSpaceRefl
         private Texture noiseTexture;
         private Texture2D m_ScramblingTile256SPP;
         private Texture2D m_OwenScrambledRGBATex;
+        private Cubemap m_Cubemap;
 
         public StochasticScreenSpaceReflectionIntersectionPass()
         {
@@ -22,6 +23,7 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing.StochasticScreenSpaceRefl
             noiseTexture = Resources.Load<Texture>("tex_BlueNoise_1024x1024_UNI");
             m_ScramblingTile256SPP = Resources.Load<Texture2D>("ScramblingTile256SPP");
             m_OwenScrambledRGBATex = Resources.Load<Texture2D>("OwenScrambledNoise256");
+            m_Cubemap = Resources.Load<Cubemap>("Enviroment");
         }
 
         internal class PassData
@@ -36,7 +38,10 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing.StochasticScreenSpaceRefl
             internal Texture noiseTexture;
             internal Texture2D m_ScramblingTile256SPP;
             internal Texture2D m_OwenScrambledRGBATex;
-            internal Vector4 JitterSizeAndOffset;
+            internal Cubemap EnvironmentTexture;
+
+            internal Vector2 Dimensions;
+            // internal Vector4 JitterSizeAndOffset;
             internal int dispatchX;
             internal int dispatchY;
         }
@@ -44,19 +49,22 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing.StochasticScreenSpaceRefl
         static void ExecutePass(PassData data, UnsafeGraphContext computeGraphContext)
         {
             var cmd = CommandBufferHelpers.GetNativeCommandBuffer(computeGraphContext.cmd);
-            cmd.SetComputeTextureParam(data.computeShader, data.kernelID, "g_lit_scene", data.sceneColor);
-            cmd.SetComputeTextureParam(data.computeShader, data.kernelID, "g_depth_buffer_hierarchy", data.sceneDepth);
-            cmd.SetComputeTextureParam(data.computeShader, data.kernelID, "g_normalSmoothness",
+            cmd.SetComputeTextureParam(data.computeShader, data.kernelID, "_CameraColor", data.sceneColor);
+            cmd.SetComputeTextureParam(data.computeShader, data.kernelID, "_HierarchyDepthTexture", data.sceneDepth);
+            cmd.SetComputeTextureParam(data.computeShader, data.kernelID, "_NormalSmoothness",
                 data.sceneNormalSmoothness);
             cmd.SetComputeTextureParam(data.computeShader, data.kernelID, "g_intersection_output",
                 data.intersectionOutput);
             cmd.SetComputeTextureParam(data.computeShader, data.kernelID, "CameraGBufferTexture1", data.gbuffer1);
-            cmd.SetComputeVectorParam(data.computeShader, "JitterSizeAndOffset", data.JitterSizeAndOffset);
+            // cmd.SetComputeVectorParam(data.computeShader, "JitterSizeAndOffset", data.JitterSizeAndOffset);
+            cmd.SetComputeTextureParam(data.computeShader, data.kernelID, "_EnvironmentTexture", data.EnvironmentTexture);
 
-            cmd.SetComputeTextureParam(data.computeShader, data.kernelID, "g_blue_noise_texture", data.noiseTexture);
+            cmd.SetComputeTextureParam(data.computeShader, data.kernelID, "_BlueNoiseTexture", data.noiseTexture);
             cmd.SetComputeFloatParam(data.computeShader, "g_depth_buffer_thickness", 0.2f);
             cmd.SetComputeIntParam(data.computeShader, "g_most_detailed_mip", 0);
             cmd.SetComputeIntParam(data.computeShader, "g_max_traversal_intersections", 128);
+            cmd.SetComputeIntParam(data.computeShader, "g_min_traversal_occupancy", 4);
+            cmd.SetComputeVectorParam(data.computeShader, "g_buffer_dimensions", data.Dimensions);
 
 
             cmd.DispatchCompute(data.computeShader, data.kernelID, data.dispatchX, data.dispatchY, 1);
@@ -105,7 +113,7 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing.StochasticScreenSpaceRefl
                 return;
             }
 
-            
+
             var hierarchyZData = frameData.Get<HierarchyZData>();
             var gbuffer1 = resourceData.gBuffer[1];
             var normalRoughness = resourceData.gBuffer[2];
@@ -136,7 +144,10 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing.StochasticScreenSpaceRefl
                 passData.dispatchX = desc.width / 8;
                 passData.dispatchY = desc.height / 8;
                 passData.gbuffer1 = gbuffer1;
-                passData.JitterSizeAndOffset = JitterSizeAndOffset;
+                passData.Dimensions = new Vector2(desc.width, desc.height);
+                passData.EnvironmentTexture = m_Cubemap;
+                
+                // passData.JitterSizeAndOffset = JitterSizeAndOffset;
                 builder.AllowGlobalStateModification(true);
                 builder.AllowPassCulling(false);
                 builder.UseTexture(passData.gbuffer1);
