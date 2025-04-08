@@ -20,7 +20,6 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing
         private static readonly int _GBuffer0 = Shader.PropertyToID("_GBuffer0");
         private static readonly int _GBuffer1 = Shader.PropertyToID("_GBuffer1");
         private static readonly int _GBuffer2 = Shader.PropertyToID("_GBuffer2");
-
         public ForwardGBufferPass(string[] PassNames)
         {
             profilingSampler = new ProfilingSampler(nameof(ForwardGBufferPass));
@@ -150,7 +149,7 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing
                 builder.SetGlobalTextureAfterPass(gBuffer0Handle, _GBuffer0);
                 builder.SetGlobalTextureAfterPass(gBuffer1Handle, _GBuffer1);
                 builder.SetGlobalTextureAfterPass(gBuffer2Handle, _GBuffer2);
-
+                resourceData.gBuffer = new[] { gBuffer0Handle, gBuffer1Handle, gBuffer2Handle };
                 // We disable culling for this pass for the demonstrative purpose of this sample, as normally this pass would be culled,
                 // since the destination texture is not used anywhere else
                 //builder.AllowGlobalStateModification(true);
@@ -159,6 +158,10 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing
                 // Assign the ExecutePass function to the render pass delegate, which will be called by the render graph when executing the pass
                 builder.SetRenderFunc((PassData data, RasterGraphContext context) => ExecutePass(data, context));
             }
+        }
+
+        public void Dispose()
+        {
         }
     }
 }

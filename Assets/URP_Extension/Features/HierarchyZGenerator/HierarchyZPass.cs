@@ -10,6 +10,7 @@ namespace URP_Extension.Features.HierarchyZGenerator
 {
     public class HierarchyZPass : ScriptableRenderPass
     {
+        private int HierarchyZId = Shader.PropertyToID("_HierarchyZTexture");
 
         public class HierarchyZPassData
         {
@@ -21,8 +22,6 @@ namespace URP_Extension.Features.HierarchyZGenerator
             public TextureHandle input;
             public TextureHandle output;
         }
-
-
 
 
         public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
@@ -48,6 +47,13 @@ namespace URP_Extension.Features.HierarchyZGenerator
             destinationDesc.colorFormat = GraphicsFormat.R32_SFloat;
 
             TextureHandle hierarchyZTexture = renderGraph.CreateTexture(destinationDesc);
+            
+            var hizExist = frameData.Contains<HierarchyZData>();
+            var hizResource = frameData.GetOrCreate<HierarchyZData>();
+            if (!hizExist)
+            {
+                hizResource.HizTexture = hierarchyZTexture;
+            }
 
             using (var builder = renderGraph.AddUnsafePass(nameof(HierarchyZPass), out HierarchyZPassData passData))
             {
@@ -60,6 +66,7 @@ namespace URP_Extension.Features.HierarchyZGenerator
                 // UseBuffer is used to setup render graph dependencies together with read and write flags.
                 builder.UseTexture(passData.input, AccessFlags.ReadWrite);
                 builder.UseTexture(passData.output, AccessFlags.ReadWrite);
+                builder.SetGlobalTextureAfterPass(passData.output, HierarchyZId);
                 // The execution function is also call SetRenderfunc for compute passes.
                 builder.SetRenderFunc((HierarchyZPassData data, UnsafeGraphContext cgContext) =>
                     ExecutePass(data, cgContext));
@@ -75,7 +82,6 @@ namespace URP_Extension.Features.HierarchyZGenerator
 
             MipGenerator.MipGenerator.Instance.RenderDepthPyramid(cmd, new Vector2Int(data.dimX,
                 data.dimY), data.input, data.output);
-
         }
     }
 }
