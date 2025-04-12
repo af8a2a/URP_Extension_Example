@@ -39,7 +39,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 813f2c3541ba4c6c86b8a5e8e9d5336e, type: 3}
   m_Name: StochasticScreenSpaceReflectionFeature
   m_EditorClassIdentifier: 
-  m_Active: 0
+  m_Active: 1
   cubemap: {fileID: 8900000, guid: 42c8d975867dbb34299217c9b3a62677, type: 3}
 --- !u!114 &-8046564352974730807
 MonoBehaviour:
@@ -408,7 +408,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f028d412f79146a9910b0ea247d73af1, type: 3}
   m_Name: ScreenSpacePathTracingFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   m_PathTracingMaterial: {fileID: 2100000, guid: e3042e4e812b16e448a5774ba2fdc419,
     type: 2}
   accurateThickness: 1

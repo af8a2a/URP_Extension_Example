@@ -16,7 +16,7 @@ namespace URP_Extension.Features.HierarchyZGenerator
         {
             public int dimX;
             public int dimY;
-
+            public HierarchyZData hierarchyZData;
 
             // Buffer handles for the compute buffers.
             public TextureHandle input;
@@ -27,8 +27,9 @@ namespace URP_Extension.Features.HierarchyZGenerator
         public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
             var resourceData = frameData.Get<UniversalResourceData>();
-            var depthTexture = resourceData.cameraDepthTexture;
+            var cameraData = frameData.Get<UniversalCameraData>();
 
+            var depthTexture = resourceData.cameraDepthTexture;
 
             // Each threadgroup works on 64x64 texels
             // uint32_t dimX = (m_Width + 63) / 64;
@@ -47,7 +48,7 @@ namespace URP_Extension.Features.HierarchyZGenerator
             destinationDesc.colorFormat = GraphicsFormat.R32_SFloat;
 
             TextureHandle hierarchyZTexture = renderGraph.CreateTexture(destinationDesc);
-            
+
             var hizExist = frameData.Contains<HierarchyZData>();
             var hizResource = frameData.GetOrCreate<HierarchyZData>();
             if (!hizExist)
@@ -63,6 +64,7 @@ namespace URP_Extension.Features.HierarchyZGenerator
                 passData.output = hierarchyZTexture;
                 passData.dimX = destinationDesc.width;
                 passData.dimY = destinationDesc.height;
+                passData.hierarchyZData = hizResource;
                 // UseBuffer is used to setup render graph dependencies together with read and write flags.
                 builder.UseTexture(passData.input, AccessFlags.ReadWrite);
                 builder.UseTexture(passData.output, AccessFlags.ReadWrite);
@@ -80,8 +82,9 @@ namespace URP_Extension.Features.HierarchyZGenerator
             // Blitter.BlitCameraTexture(cmd, data.input, data.output);
             //note:D3D11 Not support ResourcesBarrier
 
-            MipGenerator.MipGenerator.Instance.RenderDepthPyramid(cmd, new Vector2Int(data.dimX,
-                data.dimY), data.input, data.output);
+            data.hierarchyZData.MipCount = MipGenerator.MipGenerator.Instance.RenderDepthPyramid(cmd,
+                new Vector2Int(data.dimX,
+                    data.dimY), data.input, data.output);
         }
     }
 }

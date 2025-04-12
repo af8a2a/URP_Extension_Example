@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.Universal;
 using URP_Extension.Features.HierarchyZGenerator;
@@ -9,7 +10,7 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing.StochasticScreenSpaceRefl
     {
         private ForwardGBufferPass m_GBufferPass;
         private HierarchyZPass m_HierarchyZPass;
-        private StochasticScreenSpaceReflectionIntersectionPass m_intersectionPass;
+        private StochasticScreenSpaceReflectionPass _mPass;
 
         // private StochasticScreenSpaceReflectionClassifyTilesPass ClassifyTilesPass;
         private readonly string[] m_GBufferPassNames = new string[] { "UniversalGBuffer" };
@@ -19,23 +20,21 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing.StochasticScreenSpaceRefl
         {
             m_GBufferPass = new ForwardGBufferPass(m_GBufferPassNames);
             m_HierarchyZPass = new HierarchyZPass();
-            m_intersectionPass = new StochasticScreenSpaceReflectionIntersectionPass();
+            _mPass = new StochasticScreenSpaceReflectionPass(RenderPassEvent.BeforeRenderingPostProcessing);
             // ClassifyTilesPass = new StochasticScreenSpaceReflectionClassifyTilesPass();
-            m_GBufferPass.renderPassEvent = RenderPassEvent.AfterRenderingTransparents;
+            m_GBufferPass.renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
             m_HierarchyZPass.renderPassEvent = RenderPassEvent.AfterRenderingTransparents;
-            m_intersectionPass.renderPassEvent = RenderPassEvent.AfterRenderingTransparents;
         }
 
-        public override void SetupRenderPasses(ScriptableRenderer renderer, in RenderingData renderingData)
-        {
-            // ClassifyTilesPass.Setup(cubemap);
-        }
 
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
         {
+            var sssr = VolumeManager.instance.stack.GetComponent<StochasticScreenSpaceReflection>();
+            _mPass.Setup(sssr);
+
             renderer.EnqueuePass(m_GBufferPass);
             renderer.EnqueuePass(m_HierarchyZPass);
-            renderer.EnqueuePass(m_intersectionPass);
+            renderer.EnqueuePass(_mPass);
         }
     }
 }
