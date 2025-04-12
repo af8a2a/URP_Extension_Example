@@ -4,7 +4,7 @@ using URP_Extension.Features.ColorPyramid;
 
 namespace URP_Extension.Features.HierarchyZGenerator
 {
-    public class DummyFeature : ScriptableRendererFeature
+    public class CoreFeature : ScriptableRendererFeature
     {
         HierarchyZPass pass;
         ColorPyramidPass colorPyramid;
@@ -26,7 +26,6 @@ namespace URP_Extension.Features.HierarchyZGenerator
         {
             renderer.EnqueuePass(pass);
             renderer.EnqueuePass(colorPyramid);
-
         }
     }
 }

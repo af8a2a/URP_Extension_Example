@@ -19,7 +19,10 @@ namespace URP_Extension.Features.Utility
     /// </summary>
     public sealed class BlueNoiseSystem : IDisposable
     {
-        public static BlueNoiseSystem m_Instance = null;
+        private static Lazy<BlueNoiseSystem>  m_Instance = new Lazy<BlueNoiseSystem>();
+
+        public static BlueNoiseSystem Instance => m_Instance.Value;
+        
         public static int blueNoiseArraySize = 64;
 
         /// <summary>
@@ -27,7 +30,7 @@ namespace URP_Extension.Features.Utility
         /// </summary>
         [SerializeField]
         [ResourceFormattedPaths(
-            "Assets/URP_Extension/Features/Utility/Textures/STBN/vec1/stbn_vec1_2Dx1D_128x128x64_{0}.png", 0, 64)]
+            "URP_Extension/Features/Utility/Textures/STBN/vec1/stbn_vec1_2Dx1D_128x128x64_{0}.png", 0, 64)]
         readonly Texture2D[] m_Textures128R = new Texture2D[64];
 
         /// <summary>
@@ -35,7 +38,7 @@ namespace URP_Extension.Features.Utility
         /// </summary>
         [SerializeField]
         [ResourceFormattedPaths(
-            "Assets/URP_Extension/Features/Utility/Textures/STBN/vec2/stbn_vec1_2Dx1D_128x128x64_{0}.png", 0, 64)]
+            "URP_Extension/Features/Utility/Textures/STBN/vec2/stbn_vec1_2Dx1D_128x128x64_{0}.png", 0, 64)]
         readonly Texture2D[] m_Textures128RG = new Texture2D[64];
 
 
@@ -83,6 +86,7 @@ namespace URP_Extension.Features.Utility
 
         public BlueNoiseSystem()
         {
+
             InitTextures(128, TextureFormat.R16, m_Textures128R, out m_TextureArray128R, out m_TextureHandle128R);
             InitTextures(128, TextureFormat.RG32, m_Textures128RG, out m_TextureArray128RG, out m_TextureHandle128RG);
         }
@@ -92,33 +96,33 @@ namespace URP_Extension.Features.Utility
         public static readonly int s_STBNIndex = Shader.PropertyToID("_STBNIndex");
 
 
-        /// <summary>
-        /// Initialize BlueNoiseSystem.
-        /// </summary>
-        /// <param name="resources"></param>
-        internal static void Initialize()
-        {
-            if (m_Instance == null)
-                m_Instance = new BlueNoiseSystem();
-        }
+        // /// <summary>
+        // /// Initialize BlueNoiseSystem.
+        // /// </summary>
+        // /// <param name="resources"></param>
+        // internal static void Initialize()
+        // {
+        //     if (m_Instance == null)
+        //         m_Instance = new BlueNoiseSystem();
+        // }
 
-        /// <summary>
-        /// Try get blueNoise instance, could be null if not initialized before.
-        /// </summary>
-        /// <returns>null if none initialized</returns>
-        public static BlueNoiseSystem TryGetInstance()
-        {
-            return m_Instance;
-        }
-
-
-        public static void ClearAll()
-        {
-            if (m_Instance != null)
-                m_Instance.Dispose();
-
-            m_Instance = null;
-        }
+        // /// <summary>
+        // /// Try get blueNoise instance, could be null if not initialized before.
+        // /// </summary>
+        // /// <returns>null if none initialized</returns>
+        // public static BlueNoiseSystem TryGetInstance()
+        // {
+        //     return m_Instance;
+        // }
+        //
+        //
+        // public static void ClearAll()
+        // {
+        //     if (m_Instance != null)
+        //         m_Instance.Dispose();
+        //
+        //     m_Instance = null;
+        // }
 
         /// <summary>
         /// Cleanups up internal textures.

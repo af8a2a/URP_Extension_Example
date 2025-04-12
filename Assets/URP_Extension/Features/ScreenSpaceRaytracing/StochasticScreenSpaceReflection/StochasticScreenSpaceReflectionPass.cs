@@ -4,12 +4,14 @@ using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.SceneManagement;
+using URP_Extension.Features.ColorPyramid;
 using URP_Extension.Features.HierarchyZGenerator;
 using URP_Extension.Features.Utility;
 
 namespace URP_Extension.Features.ScreenSpaceRaytracing.StochasticScreenSpaceReflection
 {
-    public class StochasticScreenSpaceReflectionPass : ScriptableRenderPass
+    public partial class StochasticScreenSpaceReflectionPass : ScriptableRenderPass
     {
         // Profiling tag
         private static string m_SSRClassifyTilesProfilerTag = "SSRClassifyTiles";
@@ -35,6 +37,7 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing.StochasticScreenSpaceRefl
         private int m_SSRTracingKernel;
         private int m_SSRResolveKernel;
         private int m_SSRAccumulateKernel;
+        private RTHandle renderTextureHandle;
 
         private StochasticScreenSpaceReflection m_volumeSettings;
 
@@ -51,15 +54,11 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing.StochasticScreenSpaceRefl
             this.renderPassEvent = evt;
             m_Compute = Resources.Load<ComputeShader>("ScreenSpaceReflections");
             m_SSRClassifyTilesKernel = m_Compute.FindKernel("ScreenSpaceReflectionsClassifyTiles");
-            // m_SSRTracingKernel = m_Compute.FindKernel("ScreenSpaceReflectionsTracing");
+            m_SSRTracingKernel = m_Compute.FindKernel("ScreenSpaceReflectionsTracing");
             // m_SSRResolveKernel = m_Compute.FindKernel("ScreenSpaceReflectionsResolve");
             // m_SSRAccumulateKernel = m_Compute.FindKernel("ScreenSpaceReflectionsAccumulate");
         }
 
-        public void Setup(StochasticScreenSpaceReflection settings)
-        {
-            m_volumeSettings = settings;
-        }
 
         /// <summary>
         /// Setup controls per frame shouldEnqueue this pass.
@@ -116,54 +115,46 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing.StochasticScreenSpaceRefl
             internal TextureHandle gbuffer2;
             internal BufferHandle dispatchIndirectBuffer;
             internal BufferHandle tileListBuffer;
-            internal BufferHandle raysCoordBuffer;
 
-            // internal TextureHandle cameraDepthTexture;
-            //
-            // internal TextureHandle depthPyramidTexture;
-            // internal int depthPyramidMipLevel;
-            //
-            // // internal BufferHandle depthPyramidMipLevelOffsets;
-            // internal TextureHandle rayHitColorTexture;
-            // internal TextureHandle hitPointTexture;
+            internal TextureHandle cameraDepthTexture;
+
+            internal TextureHandle depthPyramidTexture;
+
+            internal int depthPyramidMipLevel;
+
+
+            internal TextureHandle rayHitColorTexture;
+            internal TextureHandle hitPointTexture;
             internal Vector2Int TraceTextureSize;
-            // internal int camHistoryFrameCount;
-            // internal TextureHandle blueNoiseArray;
-            // internal TextureHandle ssrLightingTexture;
-            // internal TextureHandle rayInfoTexture;
+            internal int camHistoryFrameCount;
+            internal TextureHandle blueNoiseArray;
+            internal TextureHandle ssrLightingTexture;
+
+            internal TextureHandle rayInfoTexture;
             //
             // internal TextureHandle rayDirTexture;
 
-            // internal TextureHandle motionVectorTexture;
-            // internal TextureHandle prevColorPyramidTexture;
+            internal TextureHandle motionVectorTexture;
+
+            internal TextureHandle prevColorPyramidTexture;
+
             // internal TextureHandle avgRadianceTexture;
             //
-            // internal TextureHandle currAccumulateTexture;
-            // internal TextureHandle prevAccumulateTexture;
-            // internal TextureHandle currNumFramesAccumTexture;
-            // internal TextureHandle prevNumFramesAccumTexture;
+            internal TextureHandle currAccumulateTexture;
+            internal TextureHandle prevAccumulateTexture;
+            internal TextureHandle currNumFramesAccumTexture;
+            internal TextureHandle prevNumFramesAccumTexture;
 
             internal ShaderVariablesScreenSpaceReflection constantBuffer;
 
             internal ScreenSpaceReflectionAlgorithm usedAlgo;
 
-            // // RayTracing
-            // internal BufferHandle dispatchRayIndirectBuffer;
-            //
-            // // internal bool requireRayTracing;
-            // internal RayTracingShader rtrtShader;
-            //
-            // internal RayTracingAccelerationStructure rtas;
-
-            // // Sky Ambient & Reflect
-            // internal BufferHandle ambientProbe;
-            //
-            // internal TextureHandle reflectProbe;
-            // internal ShaderVariablesRaytracing rayTracingCB;
+            internal TextureHandle reflectProbe;
         }
 
         void InitResource(RenderGraph renderGraph, SSRPassData passData, UniversalResourceData resourceData,
-            UniversalCameraData cameraData, HistoryFrameRTSystem historyRTSystem, TextureHandle hiZTexture)
+            UniversalCameraData cameraData, HistoryFrameRTSystem historyRTSystem, TextureHandle prevColorPyramidTexture,
+            TextureHandle hiZTexture)
         {
             // Compute shaders
             passData.cs = m_Compute;
@@ -199,39 +190,26 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing.StochasticScreenSpaceRefl
 
             passData.tileListBuffer = renderGraph.CreateBuffer(tileListBufferDesc);
 
-            var raysCoordBufferDesc = new BufferDesc(texDesc.width * texDesc.height, sizeof(uint))
+
+            passData.cameraDepthTexture = resourceData.cameraDepthTexture;
+            passData.depthPyramidTexture = hiZTexture;
+            // passData.depthPyramidMipLevelOffsets = resourceData.cameraDepthPyramidMipLevelOffsets;
+
+            var blueNoiseSystem = BlueNoiseSystem.Instance;
+            if (blueNoiseSystem != null)
             {
-                name = "RaysCoordBuffer"
-            };
+                passData.camHistoryFrameCount = historyRTSystem.historyFrameCount;
+                passData.blueNoiseArray = renderGraph.ImportTexture(blueNoiseSystem.textureHandle128RG);
+            }
 
-            // passData.raysCoordBuffer = renderGraph.CreateBuffer(raysCoordBufferDesc);
-
-
-            // var dispatchRayIndirect = bufferSystem.GetGraphicsBuffer<uint>(
-            //     GraphicsBufferSystemBufferID.RTRTReflectionIndirectBuffer, 3, "RTRReflectionIndirectBuffer",
-            //     GraphicsBuffer.Target.IndirectArguments);
-            // passData.dispatchRayIndirectBuffer = renderGraph.ImportBuffer(dispatchRayIndirect);
-
-
-            // passData.cameraDepthTexture = resourceData.cameraDepthTexture;
-            // // passData.depthPyramidTexture = resourceData.cameraDepthPyramidTexture;
-            // // passData.depthPyramidMipLevelOffsets = resourceData.cameraDepthPyramidMipLevelOffsets;
-            //
-            // var blueNoiseSystem = BlueNoiseSystem.TryGetInstance();
-            // if (blueNoiseSystem != null)
-            // {
-            //     passData.camHistoryFrameCount = historyRTSystem.historyFrameCount;
-            //     passData.blueNoiseArray = renderGraph.ImportTexture(blueNoiseSystem.textureHandle128RG);
-            // }
-            //
             passData.TraceTextureSize = new Vector2Int(texDesc.width, texDesc.height);
             //
-            // var rayHitColorDesc = texDesc;
-            // rayHitColorDesc.name = "_RayHitColorTexture";
-            // rayHitColorDesc.colorFormat = GraphicsFormat.R16G16B16A16_SFloat;
-            // rayHitColorDesc.clearBuffer = true;
-            // rayHitColorDesc.clearColor = new Color(0, 0, 0, 0);
-            // passData.rayHitColorTexture = renderGraph.CreateTexture(rayHitColorDesc);
+            var rayHitColorDesc = texDesc;
+            rayHitColorDesc.name = "_RayHitColorTexture";
+            rayHitColorDesc.colorFormat = GraphicsFormat.R16G16B16A16_SFloat;
+            rayHitColorDesc.clearBuffer = true;
+            rayHitColorDesc.clearColor = new Color(0, 0, 0, 0);
+            passData.rayHitColorTexture = renderGraph.CreateTexture(rayHitColorDesc);
             //
             //
             // var lightingDesc = texDesc;
@@ -242,15 +220,12 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing.StochasticScreenSpaceRefl
             // lightingDesc.clearColor = new Color(0, 0, 0, 0);
             // passData.ssrLightingTexture = renderGraph.CreateTexture(lightingDesc);
             //
-            // var rayInfoDesc = texDesc;
-            // rayInfoDesc.colorFormat = GraphicsFormat.R16G16B16A16_SFloat;
-            // rayInfoDesc.name = "_SSRRayInfoTexture";
-            // passData.rayInfoTexture = renderGraph.CreateTexture(rayInfoDesc);
-            //
-            // var dispatchRayDirDesc = texDesc;
-            // dispatchRayDirDesc.colorFormat = GraphicsFormat.R16G16B16A16_SFloat;
-            // dispatchRayDirDesc.name = "_DispatchRayDirTexture";
-            // passData.rayDirTexture = renderGraph.CreateTexture(dispatchRayDirDesc);
+            var rayInfoDesc = texDesc;
+            rayInfoDesc.colorFormat = GraphicsFormat.R16G16B16A16_SFloat;
+            rayInfoDesc.name = "_SSRRayInfoTexture";
+            passData.rayInfoTexture = renderGraph.CreateTexture(rayInfoDesc);
+
+
             //
             // var avgRadianceDesc = texDesc;
             // avgRadianceDesc.colorFormat = GraphicsFormat.B10G11R11_UFloatPack32;
@@ -260,9 +235,10 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing.StochasticScreenSpaceRefl
             // avgRadianceDesc.name = "_SSRAvgRadianceTexture";
             // passData.avgRadianceTexture = renderGraph.CreateTexture(avgRadianceDesc);
             //
-            // passData.motionVectorTexture = resourceData.motionVectorColor;
-            // passData.prevColorPyramidTexture =
-            //     renderGraph.ImportTexture(historyRTSystem.GetPreviousFrameRT(HistoryFrameType.ColorBufferMipChain));
+            passData.motionVectorTexture = resourceData.motionVectorColor;
+
+
+            passData.prevColorPyramidTexture = prevColorPyramidTexture;
             //
             // // Import history texture.
             // RTHandle currAccumulateTexture, prevAccumulateTexture;
@@ -416,6 +392,9 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing.StochasticScreenSpaceRefl
 
         static void ExecutePass(SSRPassData data, ComputeCommandBuffer cmd)
         {
+            ConstantBuffer.Push(data.constantBuffer, data.cs, _ShaderVariablesScreenSpaceReflection);
+            ExecuteClassifyTilesPass(data, cmd);
+            ExecuteTracingPass(data, cmd);
             // Default Approximation we use lighingTexture as SSRResolve handle.
             // var hitColorHandle = data.rayHitColorTexture;
             // var currAccumHandle = data.currAccumulateTexture;
@@ -433,23 +412,22 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing.StochasticScreenSpaceRefl
             //
 
             // Push ConstantBuffer to compute shader
-            ConstantBuffer.Push(data.constantBuffer, data.cs, _ShaderVariablesScreenSpaceReflection);
 
             // ClassifyTiles
-            using (new ProfilingScope(cmd, m_SSRClassifyTilesProfilingSampler))
-            {
-                cmd.SetComputeTextureParam(data.cs, data.classifyTilesKernel, "_GBuffer2",
-                    data.gbuffer2);
-
-                cmd.SetComputeBufferParam(data.cs, data.classifyTilesKernel, ShaderConstants.gDispatchIndirectBuffer,
-                    data.dispatchIndirectBuffer);
-                cmd.SetComputeBufferParam(data.cs, data.classifyTilesKernel, ShaderConstants.gTileList,
-                    data.tileListBuffer);
-
-                cmd.DispatchCompute(data.cs, data.classifyTilesKernel,
-                    RenderingUtilsExt.DivRoundUp(data.TraceTextureSize.x, 8),
-                    RenderingUtilsExt.DivRoundUp(data.TraceTextureSize.y, 8), 1);
-            }
+            // using (new ProfilingScope(cmd, m_SSRClassifyTilesProfilingSampler))
+            // {
+            //     cmd.SetComputeTextureParam(data.cs, data.classifyTilesKernel, "_GBuffer2",
+            //         data.gbuffer2);
+            //
+            //     cmd.SetComputeBufferParam(data.cs, data.classifyTilesKernel, ShaderConstants.gDispatchIndirectBuffer,
+            //         data.dispatchIndirectBuffer);
+            //     cmd.SetComputeBufferParam(data.cs, data.classifyTilesKernel, ShaderConstants.gTileList,
+            //         data.tileListBuffer);
+            //
+            //     cmd.DispatchCompute(data.cs, data.classifyTilesKernel,
+            //         RenderingUtilsExt.DivRoundUp(data.TraceTextureSize.x, 8),
+            //         RenderingUtilsExt.DivRoundUp(data.TraceTextureSize.y, 8), 1);
+            // }
 
             // // ScreenSpace Tracing
             // using (new ProfilingScope(cmd, m_SSRTracingProfilingSampler))
@@ -578,7 +556,7 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing.StochasticScreenSpaceRefl
         public void RenderSSR(RenderGraph renderGraph, ContextContainer frameData,
             int colorPyramidHistoryMipCount)
         {
-            // Early out
+            // // Early out
             // var historyRTSystem = HistoryFrameRTSystem.GetOrCreate(frameData.Get<UniversalCameraData>().camera);
             // if (historyRTSystem == null ||
             //     historyRTSystem.GetPreviousFrameRT(HistoryFrameType.ColorBufferMipChain) == null)
@@ -592,6 +570,11 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing.StochasticScreenSpaceRefl
                 // Access resources.
                 UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
                 UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
+                var environment = RenderSettings.customReflectionTexture;
+                renderTextureHandle = RTHandles.Alloc(environment);
+
+                TextureHandle environmentTextureHandle = renderGraph.ImportTexture(renderTextureHandle);
+
 
                 var historyRTSystem = HistoryFrameRTSystem.GetOrCreate(cameraData.camera);
                 // Ray Tracing
@@ -600,29 +583,32 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing.StochasticScreenSpaceRefl
                 var hiZ = frameData.Get<HierarchyZData>();
                 var hizTexture = hiZ.HizTexture;
 
+                var colorPyramid = frameData.GetOrCreate<ColorPyramidData>();
+                var prevColorTexture = colorPyramid.ColorTexture;
+
+
                 // Set passData
-                InitResource(renderGraph, passData, resourceData, cameraData, historyRTSystem, hizTexture);
+                InitResource(renderGraph, passData, resourceData, cameraData, historyRTSystem,prevColorTexture, hizTexture );
                 UpdateSSRConstantBuffer(passData, resourceData, cameraData, historyRTSystem, hiZ.MipCount,
-                    colorPyramidHistoryMipCount);
+                    colorPyramid.MipCount);
 
                 // Declare input/output textures
                 builder.UseBuffer(passData.dispatchIndirectBuffer, AccessFlags.ReadWrite);
                 builder.UseBuffer(passData.tileListBuffer, AccessFlags.ReadWrite);
                 builder.UseTexture(resourceData.gBuffer[2]); // Normal GBuffer
 
-                // builder.UseTexture(passData.cameraDepthTexture, AccessFlags.Read);
-                // builder.UseTexture(passData.depthPyramidTexture, AccessFlags.Read);
-                // builder.UseTexture(passData.blueNoiseArray, AccessFlags.Read);
-                // builder.UseTexture(passData.rayHitColorTexture, AccessFlags.ReadWrite);
-                // builder.UseTexture(passData.rayInfoTexture, AccessFlags.ReadWrite);
-                // builder.UseBuffer(passData.depthPyramidMipLevelOffsets, AccessFlags.Read);
+                builder.UseTexture(passData.cameraDepthTexture, AccessFlags.Read);
+                builder.UseTexture(passData.depthPyramidTexture, AccessFlags.Read);
+                builder.UseTexture(passData.blueNoiseArray, AccessFlags.Read);
+                builder.UseTexture(passData.rayHitColorTexture, AccessFlags.ReadWrite);
+                builder.UseTexture(passData.rayInfoTexture, AccessFlags.ReadWrite);
+
 
                 // builder.UseTexture(passData.rayDirTexture, AccessFlags.ReadWrite);
-                // builder.UseBuffer(passData.raysCoordBuffer, AccessFlags.ReadWrite);
 
-                // builder.UseTexture(passData.motionVectorTexture, AccessFlags.Read);
-                // builder.UseTexture(passData.prevColorPyramidTexture, AccessFlags.Read);
-                // builder.UseTexture(passData.avgRadianceTexture, AccessFlags.ReadWrite);
+                builder.UseTexture(passData.motionVectorTexture, AccessFlags.Read);
+                builder.UseTexture(passData.prevColorPyramidTexture, AccessFlags.Read);
+                // // builder.UseTexture(passData.avgRadianceTexture, AccessFlags.ReadWrite);
                 // builder.UseTexture(passData.ssrLightingTexture, AccessFlags.ReadWrite);
                 // builder.UseTexture(passData.currAccumulateTexture, AccessFlags.ReadWrite);
 
@@ -645,10 +631,10 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing.StochasticScreenSpaceRefl
                 // Sky Environment
                 // {
                 //     passData.ambientProbe = resourceData.skyAmbientProbe;
-                //     passData.reflectProbe = resourceData.skyReflectionProbe;
+                passData.reflectProbe = environmentTextureHandle;
                 //
                 //     builder.UseBuffer(passData.ambientProbe);
-                //     builder.UseTexture(passData.reflectProbe);
+                builder.UseTexture(passData.reflectProbe);
                 // }
 
 
