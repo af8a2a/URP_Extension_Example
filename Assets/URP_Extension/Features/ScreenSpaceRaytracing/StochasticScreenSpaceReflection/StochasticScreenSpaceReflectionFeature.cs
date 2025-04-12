@@ -10,9 +10,8 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing.StochasticScreenSpaceRefl
     {
         private ForwardGBufferPass m_GBufferPass;
         private HierarchyZPass m_HierarchyZPass;
-        private StochasticScreenSpaceReflectionPass _mPass;
+        private ClassifyTilesPass classifyTilesPass;
 
-        // private StochasticScreenSpaceReflectionClassifyTilesPass ClassifyTilesPass;
         private readonly string[] m_GBufferPassNames = new string[] { "UniversalGBuffer" };
         [SerializeField] Cubemap cubemap = null;
 
@@ -20,21 +19,22 @@ namespace URP_Extension.Features.ScreenSpaceRaytracing.StochasticScreenSpaceRefl
         {
             m_GBufferPass = new ForwardGBufferPass(m_GBufferPassNames);
             m_HierarchyZPass = new HierarchyZPass();
-            _mPass = new StochasticScreenSpaceReflectionPass(RenderPassEvent.BeforeRenderingPostProcessing);
-            // ClassifyTilesPass = new StochasticScreenSpaceReflectionClassifyTilesPass();
+
+            classifyTilesPass = new ClassifyTilesPass();
             m_GBufferPass.renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
             m_HierarchyZPass.renderPassEvent = RenderPassEvent.AfterRenderingTransparents;
+            classifyTilesPass.renderPassEvent = RenderPassEvent.AfterRenderingTransparents + 1;
         }
 
 
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
         {
-            var sssr = VolumeManager.instance.stack.GetComponent<StochasticScreenSpaceReflection>();
-            _mPass.Setup(sssr);
-
+            // var sssr = VolumeManager.instance.stack.GetComponent<StochasticScreenSpaceReflection>();
+            // _mPass.Setup(sssr);
+            //
             renderer.EnqueuePass(m_GBufferPass);
             renderer.EnqueuePass(m_HierarchyZPass);
-            renderer.EnqueuePass(_mPass);
+            renderer.EnqueuePass(classifyTilesPass);
         }
     }
 }
