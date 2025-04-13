@@ -75,78 +75,192 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fab8bd2f141248df906636224693306d, type: 3}
   m_Name: StochasticScreenSpaceReflection
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   enabled:
-    m_OverrideState: 0
-    m_Value: 0
+    m_OverrideState: 1
+    m_Value: 1
   enabledTransparent:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0
   m_MinSmoothness:
-    m_OverrideState: 0
-    m_Value: 0.9
+    m_OverrideState: 1
+    m_Value: 0.166
   m_SmoothnessFadeStart:
-    m_OverrideState: 0
-    m_Value: 0.9
+    m_OverrideState: 1
+    m_Value: 0.785
   reflectSky:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 1
   usedAlgorithm:
-    m_OverrideState: 0
-    m_Value: 0
+    m_OverrideState: 1
+    m_Value: 1
   depthBufferThickness:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0.01
   screenFadeDistance:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0.1
   accumulationFactor:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 1
   biasFactor:
     m_OverrideState: 0
     m_Value: 0
   m_RayMaxIterations:
-    m_OverrideState: 0
-    m_Value: 32
+    m_OverrideState: 1
+    m_Value: 64
   ambientProbeDimmer:
     m_OverrideState: 0
     m_Value: 1
   layerMask:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value:
       serializedVersion: 2
       m_Bits: 4294967295
   textureLodBias:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 1
   m_RayLength:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 50
   m_ClampValue:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 1
   m_Denoise:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 1
   m_DenoiserRadius:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 8
   m_AffectSmoothSurfaces:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0
   m_FullResolution:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0
   sampleCount:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 1
   bounceCount:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 1
   m_RayMaxIterationsRT:
     m_OverrideState: 0
-    m_Value: 48
+    m_Value: 90
+--- !u!114 &-3787729622631231065
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7170cdcc10774c10b23f0a7bf88aab69, type: 3}
+  m_Name: ScreenSpacePathTracing
+  m_EditorClassIdentifier: 
+  active: 0
+  state:
+    m_OverrideState: 1
+    m_Value: 1
+  maximumSamples:
+    m_OverrideState: 1
+    m_Value: 256
+  maximumDepth:
+    m_OverrideState: 1
+    m_Value: 4
+  maximumIntensity:
+    m_OverrideState: 1
+    m_Value: 10
+  samplesPerPixel:
+    m_OverrideState: 1
+    m_Value: 1
+  maximumSteps:
+    m_OverrideState: 1
+    m_Value: 24
+  stepSize:
+    m_OverrideState: 1
+    m_Value: 0.4
+  noiseMethod:
+    m_OverrideState: 1
+    m_Value: 0
+  denoiser:
+    m_OverrideState: 1
+    m_Value: 1
+  accumFactor:
+    m_OverrideState: 1
+    m_Value: 0.9
+  ambientStored:
+    m_OverrideState: 1
+    m_Value: 0
+  ambientIntensity:
+    m_OverrideState: 1
+    m_Value: 1
+  ambientLight:
+    m_OverrideState: 1
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
+    hdr: 0
+  ambientGroundColor:
+    m_OverrideState: 1
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
+    hdr: 0
+  ambientEquatorColor:
+    m_OverrideState: 1
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
+    hdr: 0
+  ambientSkyColor:
+    m_OverrideState: 1
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
+    hdr: 0
+--- !u!114 &-1875952534808626504
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00b5265c810b432fa2bd33642d3e9cde, type: 3}
+  m_Name: ScreenSpaceReflection
+  m_EditorClassIdentifier: 
+  active: 1
+  state:
+    m_OverrideState: 1
+    m_Value: 1
+  algorithm:
+    m_OverrideState: 1
+    m_Value: 1
+  minSmoothness:
+    m_OverrideState: 0
+    m_Value: 0.4
+  fadeSmoothness:
+    m_OverrideState: 0
+    m_Value: 0.6
+  edgeFade:
+    m_OverrideState: 1
+    m_Value: 0.1
+  thicknessMode:
+    m_OverrideState: 0
+    m_Value: 0
+  thickness:
+    m_OverrideState: 1
+    m_Value: 0.25
+  quality:
+    m_OverrideState: 0
+    m_Value: 0
+  maxStep:
+    m_OverrideState: 0
+    m_Value: 16
+  accumFactor:
+    m_OverrideState: 0
+    m_Value: 0.75
+  resolution:
+    m_OverrideState: 0
+    m_Value: 4
+  mipmapsMode:
+    m_OverrideState: 0
+    m_Value: 1
 --- !u!114 &-846946144023673425
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -245,6 +359,8 @@ MonoBehaviour:
   - {fileID: 849379129802519247}
   - {fileID: 3988037984815077074}
   - {fileID: -4934765091594462206}
+  - {fileID: -3787729622631231065}
+  - {fileID: -1875952534808626504}
 --- !u!114 &849379129802519247
 MonoBehaviour:
   m_ObjectHideFlags: 3
