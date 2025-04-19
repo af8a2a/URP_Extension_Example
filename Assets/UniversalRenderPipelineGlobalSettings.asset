@@ -88,10 +88,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 52578919444643898
       type: {class: UniversalRenderPipelineRuntimeTexturesExt, ns: URP_Extension.Features.Utility,
         asm: URP_Extension}
-      data: 
     - rid: 2215416432349151424
       type: {class: UniversalRenderPipelineEditorMaterials, ns: UnityEngine.Rendering.Universal,
         asm: Unity.RenderPipelines.Universal.Runtime}

@@ -133,6 +133,20 @@ MonoBehaviour:
     DirectLightingStrength: 0.437
     Radius: 0.34
     SampleCount: 20
+--- !u!114 &-4283568933306588130
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 695345f1ac60456d91a000c9f223505f, type: 3}
+  m_Name: FidelityFXDofFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  computeShader: {fileID: 7200000, guid: 9a9b7a375729435ea2799bc6f3267783, type: 3}
 --- !u!114 &-3686001903448193319
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -177,7 +191,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f3f560528c64a82bdfbba7b90c2d1bc, type: 3}
   m_Name: ScreenSpaceReflectionFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
 --- !u!114 &-2902112244124871261
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -292,13 +306,11 @@ MonoBehaviour:
   - {fileID: -7267285831880783935}
   - {fileID: -1813445979578815844}
   - {fileID: -3086511105373398166}
-  - {fileID: 3892018970804695259}
   - {fileID: 7973002900594852328}
   - {fileID: 2969682126515046944}
-  - {fileID: -8938788327179079504}
-  - {fileID: 4588228478148881060}
-  - {fileID: 4153725938270126180}
-  m_RendererFeatureMap: 0195c101971b49aabac34b1732461083a315a03e4aa0b9d70912a1b4490d447cd9868e4fccb0d8cc61dca0484708ee47acc60934b88808307bf2e728de5b1fb6b4b5f0202cc32eecc14784250a6a259b9c2ad8577d58d5e66a9bebb080822ad5db30e515a23a0336e8811d33e5cba56e208ac1f6286e3629b030154c600bf383a42a65cc7da9ac3f64c0eac4bbffa439
+  - {fileID: 3698440754958422030}
+  - {fileID: 3249375355906512}
+  m_RendererFeatureMap: 0195c101971b49aabac34b1732461083a315a03e4aa0b9d70912a1b4490d447cd9868e4fccb0d8cc61dca0484708ee47acc60934b88808307bf2e728de5b1fb6b4b5f0202cc32eecc14784250a6a259b9c2ad8577d58d5e66a9bebb080822ad5e8811d33e5cba56e208ac1f6286e36290ed01f7e45805333d0a9d4274a8b0b00
   m_UseNativeRenderPass: 0
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -324,6 +336,19 @@ MonoBehaviour:
   m_DepthTextureFormat: 0
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 1
+--- !u!114 &3249375355906512
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08c88854078c472c9de4b81390533113, type: 3}
+  m_Name: DepthOfFieldFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
 --- !u!114 &2572798478460618487
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -369,6 +394,19 @@ MonoBehaviour:
   m_Name: ScratchFeature
   m_EditorClassIdentifier: 
   m_Active: 0
+--- !u!114 &3698440754958422030
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ee7be4fa29e460ab3cc5510ea25722e, type: 3}
+  m_Name: DummyFeature
+  m_EditorClassIdentifier: 
+  m_Active: 0
 --- !u!114 &3892018970804695259
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -396,25 +434,6 @@ MonoBehaviour:
   m_Name: CoreFeature
   m_EditorClassIdentifier: 
   m_Active: 1
---- !u!114 &4588228478148881060
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f028d412f79146a9910b0ea247d73af1, type: 3}
-  m_Name: ScreenSpacePathTracingFeature
-  m_EditorClassIdentifier: 
-  m_Active: 1
-  m_PathTracingMaterial: {fileID: 2100000, guid: e3042e4e812b16e448a5774ba2fdc419,
-    type: 2}
-  accurateThickness: 1
-  refraction: 0
-  progressBar: 1
-  spatialDenoise: 1
 --- !u!114 &5181395248709815091
 MonoBehaviour:
   m_ObjectHideFlags: 0

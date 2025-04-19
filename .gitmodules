@@ -2,3 +2,7 @@
 	path = Packages/Custom_URP
 	url = https://github.com/af8a2a/Custom_URP
 	branch = URP17
+[submodule "Packages/URP_Extension"]
+	path = Packages/URP_Extension
+	url = https://github.com/af8a2a/URP_Extension_Core
+	branch = master
