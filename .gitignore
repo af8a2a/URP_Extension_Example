@@ -1,0 +1,9 @@
+/Library
+/UserSettings
+/Temp
+/Logs
+/obj
+/.idea
+/*.csproj
+/Packages/packages-lock.json
+/URP_Extension.sln.DotSettings.user
