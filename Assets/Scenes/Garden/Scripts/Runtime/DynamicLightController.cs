@@ -98,7 +98,7 @@ public class DynamicLightsManager
     {
 #if UNITY_EDITOR
         bool ignoreSceneCamera = true;
-        if (ignoreSceneCamera && _camera.name == "SceneCamera")
+        if (ignoreSceneCamera && _camera.cameraType == CameraType.SceneView)
             ResetAllLights();
         else
 #endif

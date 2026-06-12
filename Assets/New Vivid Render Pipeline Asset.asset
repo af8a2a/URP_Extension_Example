@@ -12,8 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d5a70373dd8ab94b9e683327443fffd, type: 3}
   m_Name: New Vivid Render Pipeline Asset
   m_EditorClassIdentifier: VividRP.Runtime::VividRP.Runtime.VividRenderPipelineAsset
-  RenderGraphAsset: {fileID: 2841676755933307327, guid: 82fd021a6fd5e9949bb9d28657acd6bc, type: 3}
+  RenderGraphAsset: {fileID: 2841676755933307327, guid: 8f21c71b7971b0948bcc5a44c1195ebd, type: 3}
   m_EnableAsyncCompute: 1
-  m_EnableGPUDriven: 0
-  m_EnableGPUDrivenDebugOverlay: 0
+  m_EnableGPUDriven: 1
+  m_EnableGPUDrivenDecal: 1
   m_EnableSRPBatcher: 1
+  m_SupportProbeVolume: 0
+  m_ProbeVolumeSHBands: 2
+  m_ColorGradingSpace: 0
+  m_AutoExposureImplementation: 1

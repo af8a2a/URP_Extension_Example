@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: cbe6ffda2410a734fb1796a0253c9248
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 9d714e2d1ea690345bfa9c59b7fd29ba, type: 3}
+  SourceTexture: {fileID: 2800000, guid: 353965a4dd4e9904fa07287e1bf75cd8, type: 3}
+  NormalTexture: {fileID: 2800000, guid: 4e11e4ad9ef720042941501e6258b769, type: 3}
+  MaskTexture: {instanceID: 0}
+  PageSize: 128
+  BorderSize: 4
+  MipCount: 6
+  FallbackColor: {r: 0.8301887, g: 0.8301887, b: 0.8301887, a: 1}
+  NormalFallbackColor: {r: 0.5, g: 0.5, b: 1, a: 1}
+  MaskFallbackColor: {r: 1, g: 1, b: 1, a: 1}

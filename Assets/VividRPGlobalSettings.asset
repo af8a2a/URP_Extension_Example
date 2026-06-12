@@ -12,6 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 644d7ba87eeb6bb4abf7d24ac8cf910f, type: 3}
   m_Name: VividRPGlobalSettings
   m_EditorClassIdentifier: VividRP.Runtime::VividRP.Runtime.VividRenderPipelineGlobalSettings
+  m_APVSceneData:
+    obsoleteSceneBounds:
+      m_Keys: []
+      m_Values: []
+    obsoleteHasProbeVolumes:
+      m_Keys: []
+      m_Values: {_typeName: UInt8, _data: }
   m_Settings:
     m_SettingsList:
       m_List:
@@ -33,6 +40,7 @@ MonoBehaviour:
       - rid: 2476154776507384024
     m_RuntimeSettings:
       m_List: []
+  m_MaxLocalVolumetricFogCount: 64
   references:
     version: 2
     RefIds:
